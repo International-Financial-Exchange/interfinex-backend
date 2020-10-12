@@ -49,7 +49,7 @@ class Factory {
                 SWAP_COLLECTIONS.exchangesCollection.updateOne(
                     { baseTokenAddress, assetTokenAddress },
                     { "$set": { exchangeAddress }},
-                    { "upsert": true },
+                    { upsert: true },
                 )
             )
         );
@@ -63,7 +63,7 @@ class Factory {
                 SWAP_COLLECTIONS.exchangesCollection.updateOne(
                     { baseTokenAddress: base_token, assetTokenAddress: asset_token },
                     { "$set": { exchangeAddress: contract }},
-                    { "upsert": true },
+                    { upsert: true },
                 );
             })
             .on("changed", async ({ returnValues: { contract }}: any) => {

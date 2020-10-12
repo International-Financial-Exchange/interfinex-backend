@@ -1,12 +1,23 @@
 import { DATABASE } from "../Global/database";
+import { Timeframes } from "../Global/constants";
 
 export const EXCHANGES_COLL_NAME = "swap.exchanges";
 
+type CandleTimeframe = {
+    timeframe: number,
+    stalePeriod?: number,
+};
+
 export class SwapCollections {
     public exchangesCollection: any;
-    public tradesCollections: { [exchangeAddress: string]: any } = {};
+    public tradeHistoryCollections: { [exchangeAddress: string]: any } = {};
     public candleCollections: { [exchangeAddress: string]: { [timeframe: string]: any }} = {};
-    static candleTimeframes: number[] = [1000 * 60, 1000 * 60 * 15, 1000 * 60 * 60 * 4];
+    
+    static candleTimeframes: CandleTimeframe[] = [
+        { timeframe: Timeframes["1m"], stalePeriod: 1000 * 60 * 60 * 24 }, 
+        { timeframe: Timeframes["15m"], stalePeriod: 1000 * 60 * 60 * 24 * 7 }, 
+        { timeframe: Timeframes["4h"], }
+    ];
 
     async init() {
         console.log(`Fetching Swap collections`);
@@ -47,25 +58,34 @@ export class SwapCollections {
                 "validator": {
                     "$jsonSchema": { 
                         "bsonType": "object",
-                        "required": ["baseTokenAmount", "assetTokenAmount", "isBuy", "user", "txId"],
+                        "required": ["baseTokenAmount", "assetTokenAmount", "isBuy", "user", "txId", "timestamp"],
                         "properties": {
                             "baseTokenAmount": { "bsonType": "string" },
                             "assetTokenAmount": { "bsonType": "string" },
                             "isBuy": { "bsonType": "bool" },
                             "user": { "bsonType": "string" },
-                            "txId": { "bsonType": "string" }
+                            "txId": { "bsonType": "string" },
+                            "timestamp": { "bsonType": "double" }
                         }
                     }
                 }
             });
+
+            // Remove trades after a week
+            DATABASE.db.collection(TRADES_COLL_NAME).createIndex(
+                { "timestamp": 1 }, 
+                { expireAfterSeconds: 1000 * 60 * 60 * 24 * 7 }
+            );
+
+            DATABASE.db.collection(TRADES_COLL_NAME).createIndex({ "user": 1, "txId": 1 },);
         }
 
-        this.tradesCollections[exchangeAddress] = await DATABASE.db.collection(TRADES_COLL_NAME);
+        this.tradeHistoryCollections[exchangeAddress] = await DATABASE.db.collection(TRADES_COLL_NAME);
     }
 
     async addCandleCollection(exchangeAddress: string) {
         await Promise.all(
-            SwapCollections.candleTimeframes.map(async timeframe => {
+            SwapCollections.candleTimeframes.map(async ({ timeframe, stalePeriod }) => {
                 const CANDLES_COLL_NAME = `swap.candles.${timeframe}.${exchangeAddress}`;
     
                 let candlesCollExists = (await DATABASE.db.listCollections({ name: CANDLES_COLL_NAME }).toArray()).first();
@@ -87,6 +107,13 @@ export class SwapCollections {
                             }
                         }
                     });
+
+                    // Remove any stale candles using a TTL index
+                    // stalePeriod can be undefined, in which case candles will never expire
+                    DATABASE.db.collection(CANDLES_COLL_NAME).createIndex(
+                        { "openTimestamp": 1 },
+                        { expireAfterSeconds: stalePeriod }
+                    );
                 }
     
                 if (!this.candleCollections[exchangeAddress]) this.candleCollections[exchangeAddress] = {};

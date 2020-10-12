@@ -54,7 +54,7 @@ class Factory {
                 };
             })));
             // Update 'swap.exchanges' so that it contains all of the exchanges
-            yield Promise.all(pairs.map(({ baseTokenAddress, assetTokenAddress, exchangeAddress }) => collections_1.SWAP_COLLECTIONS.exchangesCollection.updateOne({ baseTokenAddress, assetTokenAddress }, { "$set": { exchangeAddress } }, { "upsert": true })));
+            yield Promise.all(pairs.map(({ baseTokenAddress, assetTokenAddress, exchangeAddress }) => collections_1.SWAP_COLLECTIONS.exchangesCollection.updateOne({ baseTokenAddress, assetTokenAddress }, { "$set": { exchangeAddress } }, { upsert: true })));
         });
     }
     startExchangeCreationListener() {
@@ -63,7 +63,7 @@ class Factory {
             this.factoryContract.events.NewExchange()
                 .on("data", ({ returnValues: { base_token, asset_token, contract } }) => __awaiter(this, void 0, void 0, function* () {
                 console.log(`   ⛏️  Inserting new swap exchange for: ${contract}`);
-                collections_1.SWAP_COLLECTIONS.exchangesCollection.updateOne({ baseTokenAddress: base_token, assetTokenAddress: asset_token }, { "$set": { exchangeAddress: contract } }, { "upsert": true });
+                collections_1.SWAP_COLLECTIONS.exchangesCollection.updateOne({ baseTokenAddress: base_token, assetTokenAddress: asset_token }, { "$set": { exchangeAddress: contract } }, { upsert: true });
             }))
                 .on("changed", ({ returnValues: { contract } }) => __awaiter(this, void 0, void 0, function* () {
                 console.log(`   ⛏️  Chain reorg - Removing swap exchange`);

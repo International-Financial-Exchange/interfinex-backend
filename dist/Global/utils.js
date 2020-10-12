@@ -19,13 +19,24 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.newContract = void 0;
+exports.isObject = exports.removeEmptyFields = exports.newContract = void 0;
 const ethers_1 = require("./ethers");
 const ethers_2 = require("ethers");
 const _ = __importStar(require("lodash"));
 exports.newContract = (address, abi) => {
     return new ethers_2.ethers.Contract(address, abi, ethers_1.provider);
 };
+// Empty out all keys in an object that have a field of undefined
+exports.removeEmptyFields = ($obj) => {
+    for (const k of Object.keys($obj)) {
+        if ($obj[k] === undefined)
+            delete $obj[k];
+        if (exports.isObject($obj[k]))
+            exports.removeEmptyFields($obj[k]);
+    }
+    return $obj;
+};
+exports.isObject = (item) => typeof item === "object" && !Array.isArray(item) && item !== null;
 Array.prototype.last = function () {
     return _.cloneDeep(this[this.length - 1]);
 };

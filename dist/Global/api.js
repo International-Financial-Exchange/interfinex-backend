@@ -8,17 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const swap_1 = require("./Swap/swap");
-const database_1 = require("./Global/database");
-require("./Global/utils");
-const api_1 = require("./Global/api");
-const api_2 = require("./Swap/api");
-const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield database_1.DATABASE.init();
-    yield swap_1.SWAP.start();
-    yield api_1.GLOBAL_API.start();
-    yield api_2.SWAP_API.start();
-});
-main();
-//# sourceMappingURL=index.js.map
+exports.GLOBAL_API = void 0;
+const express_1 = __importDefault(require("express"));
+class GlobalApi {
+    constructor() {
+        this.app = express_1.default();
+    }
+    start() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.app.listen(GlobalApi.PORT, () => {
+                console.log(`\n🚀 API started and listening at port: ${GlobalApi.PORT}\n`);
+            });
+        });
+    }
+}
+GlobalApi.PORT = 8080;
+exports.GLOBAL_API = new GlobalApi();
+//# sourceMappingURL=api.js.map
