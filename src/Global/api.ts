@@ -1,10 +1,13 @@
 import express from "express";
+import cors from "cors";
 
 class GlobalApi {
     static PORT = 8080;
     app = express();
 
     async start() {
+        // TODO: This is unsafe! Change to only allow some origins
+        this.app.use(cors());
         this.app.listen(GlobalApi.PORT, () => {
             console.log(`\n🚀 API started and listening at port: ${GlobalApi.PORT}\n`)
         });

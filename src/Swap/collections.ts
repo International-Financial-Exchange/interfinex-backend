@@ -1,5 +1,6 @@
 import { DATABASE } from "../Global/database";
-import { Timeframes } from "../Global/constants";
+import { TIMEFRAMES } from "../Global/constants";
+import { removeEmptyFields } from "../Global/utils";
 
 export const EXCHANGES_COLL_NAME = "swap.exchanges";
 
@@ -11,12 +12,12 @@ type CandleTimeframe = {
 export class SwapCollections {
     public exchangesCollection: any;
     public tradeHistoryCollections: { [exchangeAddress: string]: any } = {};
-    public candleCollections: { [exchangeAddress: string]: { [timeframe: string]: any }} = {};
+    public candleCollections: { [baseTokenAddress: string]: { [assetTokenAddress: string]: { [timeframe: number]: any } }} = {};
     
     static candleTimeframes: CandleTimeframe[] = [
-        { timeframe: Timeframes["1m"], stalePeriod: 1000 * 60 * 60 * 24 }, 
-        { timeframe: Timeframes["15m"], stalePeriod: 1000 * 60 * 60 * 24 * 7 }, 
-        { timeframe: Timeframes["4h"], }
+        { timeframe: TIMEFRAMES["1m"], stalePeriod: 1000 * 60 * 60 * 24 }, 
+        { timeframe: TIMEFRAMES["15m"], stalePeriod: 1000 * 60 * 60 * 24 * 7 }, 
+        { timeframe: TIMEFRAMES["4h"], }
     ];
 
     async init() {
@@ -83,10 +84,10 @@ export class SwapCollections {
         this.tradeHistoryCollections[exchangeAddress] = await DATABASE.db.collection(TRADES_COLL_NAME);
     }
 
-    async addCandleCollection(exchangeAddress: string) {
+    async addCandleCollection(baseTokenAddress: string, assetTokenAddress: string) {
         await Promise.all(
             SwapCollections.candleTimeframes.map(async ({ timeframe, stalePeriod }) => {
-                const CANDLES_COLL_NAME = `swap.candles.${timeframe}.${exchangeAddress}`;
+                const CANDLES_COLL_NAME = `swap.candles.${timeframe}.${baseTokenAddress}.${assetTokenAddress}`;
     
                 let candlesCollExists = (await DATABASE.db.listCollections({ name: CANDLES_COLL_NAME }).toArray()).first();
                 if (!candlesCollExists) {
@@ -112,12 +113,13 @@ export class SwapCollections {
                     // stalePeriod can be undefined, in which case candles will never expire
                     DATABASE.db.collection(CANDLES_COLL_NAME).createIndex(
                         { "openTimestamp": 1 },
-                        { expireAfterSeconds: stalePeriod }
+                        removeEmptyFields({ expireAfterSeconds: stalePeriod })
                     );
                 }
     
-                if (!this.candleCollections[exchangeAddress]) this.candleCollections[exchangeAddress] = {};
-                this.candleCollections[exchangeAddress][timeframe] = await DATABASE.db.collection(CANDLES_COLL_NAME);
+                if (!this.candleCollections[baseTokenAddress]) this.candleCollections[baseTokenAddress] = {};
+                if (!this.candleCollections[baseTokenAddress][assetTokenAddress]) this.candleCollections[baseTokenAddress][assetTokenAddress] = {};
+                this.candleCollections[baseTokenAddress][assetTokenAddress][timeframe] = await DATABASE.db.collection(CANDLES_COLL_NAME);
             })
         );
     }

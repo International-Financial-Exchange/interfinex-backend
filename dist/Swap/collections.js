@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SWAP_COLLECTIONS = exports.SwapCollections = exports.EXCHANGES_COLL_NAME = void 0;
 const database_1 = require("../Global/database");
 const constants_1 = require("../Global/constants");
+const utils_1 = require("../Global/utils");
 exports.EXCHANGES_COLL_NAME = "swap.exchanges";
 class SwapCollections {
     constructor() {
@@ -76,10 +77,10 @@ class SwapCollections {
             this.tradeHistoryCollections[exchangeAddress] = yield database_1.DATABASE.db.collection(TRADES_COLL_NAME);
         });
     }
-    addCandleCollection(exchangeAddress) {
+    addCandleCollection(baseTokenAddress, assetTokenAddress) {
         return __awaiter(this, void 0, void 0, function* () {
             yield Promise.all(SwapCollections.candleTimeframes.map(({ timeframe, stalePeriod }) => __awaiter(this, void 0, void 0, function* () {
-                const CANDLES_COLL_NAME = `swap.candles.${timeframe}.${exchangeAddress}`;
+                const CANDLES_COLL_NAME = `swap.candles.${timeframe}.${baseTokenAddress}.${assetTokenAddress}`;
                 let candlesCollExists = (yield database_1.DATABASE.db.listCollections({ name: CANDLES_COLL_NAME }).toArray()).first();
                 if (!candlesCollExists) {
                     console.log(`   ⛏️  Creating ${CANDLES_COLL_NAME} collection`);
@@ -101,20 +102,22 @@ class SwapCollections {
                     });
                     // Remove any stale candles using a TTL index
                     // stalePeriod can be undefined, in which case candles will never expire
-                    database_1.DATABASE.db.collection(CANDLES_COLL_NAME).createIndex({ "openTimestamp": 1 }, { expireAfterSeconds: stalePeriod });
+                    database_1.DATABASE.db.collection(CANDLES_COLL_NAME).createIndex({ "openTimestamp": 1 }, utils_1.removeEmptyFields({ expireAfterSeconds: stalePeriod }));
                 }
-                if (!this.candleCollections[exchangeAddress])
-                    this.candleCollections[exchangeAddress] = {};
-                this.candleCollections[exchangeAddress][timeframe] = yield database_1.DATABASE.db.collection(CANDLES_COLL_NAME);
+                if (!this.candleCollections[baseTokenAddress])
+                    this.candleCollections[baseTokenAddress] = {};
+                if (!this.candleCollections[baseTokenAddress][assetTokenAddress])
+                    this.candleCollections[baseTokenAddress][assetTokenAddress] = {};
+                this.candleCollections[baseTokenAddress][assetTokenAddress][timeframe] = yield database_1.DATABASE.db.collection(CANDLES_COLL_NAME);
             })));
         });
     }
 }
 exports.SwapCollections = SwapCollections;
 SwapCollections.candleTimeframes = [
-    { timeframe: constants_1.Timeframes["1m"], stalePeriod: 1000 * 60 * 60 * 24 },
-    { timeframe: constants_1.Timeframes["15m"], stalePeriod: 1000 * 60 * 60 * 24 * 7 },
-    { timeframe: constants_1.Timeframes["4h"], }
+    { timeframe: constants_1.TIMEFRAMES["1m"], stalePeriod: 1000 * 60 * 60 * 24 },
+    { timeframe: constants_1.TIMEFRAMES["15m"], stalePeriod: 1000 * 60 * 60 * 24 * 7 },
+    { timeframe: constants_1.TIMEFRAMES["4h"], }
 ];
 exports.SWAP_COLLECTIONS = new SwapCollections();
 //# sourceMappingURL=collections.js.map

@@ -39,24 +39,26 @@ class AllExchanges {
         const exchanges: { [key: string]: string }[] = await SWAP_COLLECTIONS.exchangesCollection.find().toArray();
 
         FACTORY.factoryContract.events.NewExchange()
-            .on("data", async ({ returnValues: { contract }}: any) => {
+            .on("data", async ({ returnValues: { contract, base_token, asset_token }}: any) => {
                 console.log(`   🎧 Started listening to a new swap exchange at: ${contract}`);
-                this.addExchange(contract);
+                this.addExchange(contract, base_token, asset_token);
             })
             .on("change", async ({ returnValues: { contract }}: any) => {
                 this.removeExchange(contract);
             });
 
         const listeners = await Promise.all(
-            exchanges.map(async ({ exchangeAddress }) => this.addExchange(exchangeAddress))
+            exchanges.map(async ({ exchangeAddress, assetTokenAddress, baseTokenAddress }) => 
+                this.addExchange(exchangeAddress, baseTokenAddress, assetTokenAddress)
+            )
         );
 
         console.log(`   🎧 Listening to ${listeners.length} swap exchanges`);
         console.log(`   DEV: Deployed Exchanges:`, exchanges);
     }
 
-    async addExchange(contract: string) {
-        const exchange = new Exchange(contract);
+    async addExchange(contract: string, baseTokenAddress: string, assetTokenAddress: string) {
+        const exchange = new Exchange(contract, baseTokenAddress, assetTokenAddress);
         await exchange.start();
         this.exchanges.push(exchange);
     }
@@ -71,16 +73,21 @@ class AllExchanges {
 
 class Exchange {
     public contract: any;
+    public baseTokenAddress: string;
+    public assetTokenAddress: string;
     private swapEventEmitter!: EventEmitter;
     private tradeHistoryCollection: any;
 
-    constructor(contractAddress: string) {
+    constructor(contractAddress: string, baseTokenAddress: string, assetTokenAddress: string) {
         this.contract = newContract(exchangeArtifact.abi, contractAddress);
+        this.baseTokenAddress = baseTokenAddress;
+        this.assetTokenAddress = assetTokenAddress;
     }
     
     async start() {
         await SWAP_COLLECTIONS.addTradeHistoryCollection(this.contract.options.address);
-        await SWAP_COLLECTIONS.addCandleCollection(this.contract.options.address);
+        await SWAP_COLLECTIONS.addCandleCollection(this.baseTokenAddress, this.assetTokenAddress);
+        await SWAP_COLLECTIONS.addCandleCollection(this.assetTokenAddress, this.baseTokenAddress);
         this.tradeHistoryCollection = SWAP_COLLECTIONS.tradeHistoryCollections[this.contract.options.address];
         await this.startTradeListener();
     }
@@ -130,33 +137,43 @@ class Exchange {
 
     async addTradeToCandles(trade: Trade) {
         Promise.all(
-            SwapCollections.candleTimeframes.map(async ({ timeframe }) => {
-                const candleCollection = SWAP_COLLECTIONS.candleCollections[this.contract.options.address][timeframe];
-                const openTimestamp = Math.floor(Date.now() / timeframe) * timeframe;
-
-                // Multiply the price by 1 Wei so we get 18 decimals of precision.
-                const assetPrice = new BN(Web3.utils.toWei(trade.assetTokenAmount)).div(new BN(trade.baseTokenAmount));
-
-                // Get the current candle in this openTimestamp or create a new candle.
-                const lastCandle: Candle = await candleCollection.findOne({ openTimestamp });
-                const currentCandle = lastCandle ?? {
-                    high: "0",
-                    low: "0",
-                    open: assetPrice.toString(),
-                    close: "0",
-                    openTimestamp,
-                };
-
-                currentCandle.high = BN.max(new BN(currentCandle.high), assetPrice).toString();
-                currentCandle.low = currentCandle.low === "0" ? assetPrice.toString() : BN.min(new BN(currentCandle.low), assetPrice).toString();
-                currentCandle.close = assetPrice.toString();
-                currentCandle.volume = new BN(currentCandle.volume).add(new BN(trade.assetTokenAmount)).toString();
-
-                console.log("last Candle", lastCandle);
-                console.log("current candle", currentCandle);
-
-                await candleCollection.updateOne({ openTimestamp }, { "$set": currentCandle }, { upsert: true });
-            })
+            SwapCollections.candleTimeframes.map(async ({ timeframe }) =>
+                // Insert candles for base/asset and asset/base
+                Promise.all([
+                    {
+                        candleCollection: SWAP_COLLECTIONS.candleCollections[this.baseTokenAddress][this.assetTokenAddress][timeframe],
+                        assetPrice: new BN(Web3.utils.toWei(trade.baseTokenAmount)).div(new BN(trade.assetTokenAmount)),
+                        volume: new BN(trade.baseTokenAmount),
+                    },
+                    {
+                        candleCollection: SWAP_COLLECTIONS.candleCollections[this.assetTokenAddress][this.baseTokenAddress][timeframe],
+                        assetPrice: new BN(Web3.utils.toWei(trade.assetTokenAmount)).div(new BN(trade.baseTokenAmount)),
+                        volume: new BN(trade.assetTokenAmount),
+                    }
+                ].map(async ({ candleCollection, assetPrice, volume }) => {
+                    const openTimestamp = Math.floor(Date.now() / timeframe) * timeframe;
+    
+                    // Get the current candle in this openTimestamp or create a new candle.
+                    const lastCandle: Candle = await candleCollection.findOne({ openTimestamp });
+                    const currentCandle = lastCandle ?? {
+                        high: "0",
+                        low: "0",
+                        open: assetPrice.toString(),
+                        close: "0",
+                        openTimestamp,
+                    };
+    
+                    currentCandle.high = BN.max(new BN(currentCandle.high), assetPrice).toString();
+                    currentCandle.low = currentCandle.low === "0" ? assetPrice.toString() : BN.min(new BN(currentCandle.low), assetPrice).toString();
+                    currentCandle.close = assetPrice.toString();
+                    currentCandle.volume = new BN(currentCandle.volume).add(volume).toString();
+    
+                    console.log("last Candle", lastCandle);
+                    console.log("current candle", currentCandle);
+    
+                    await candleCollection.updateOne({ openTimestamp }, { "$set": currentCandle }, { upsert: true });
+                }))
+            )
         );
     }
 
@@ -164,19 +181,31 @@ class Exchange {
         const trade = await this.tradeHistoryCollection.findOne({ user, txId });
 
         await Promise.all(
-            SwapCollections.candleTimeframes.map(async ({ timeframe }) => {
-                const candleCollection = SWAP_COLLECTIONS.candleCollections[this.contract.options.address][timeframe];
-                const openTimestamp = Math.floor(trade.timestamp / timeframe) * timeframe;
-                const candle = await candleCollection.findOne({ openTimestamp });
-                
-                // Simple update - just deduct the volume from the existing candle
-                // Possible TODO: Add in more fine-grained removal - Track the highest, lowest and close prices to see if they
-                // need updating too.
-                if (candle) {
-                    candle.volume = new BN(candle.volume).sub(trade.assetTokenAmount);
-                    candleCollection.updateOne({ openTimestamp }, candle);
-                }
-            })
+            SwapCollections.candleTimeframes.map(async ({ timeframe }) =>
+                Promise.all(
+                    [
+                        {
+                            candleCollection: SWAP_COLLECTIONS.candleCollections[this.baseTokenAddress][this.assetTokenAddress][timeframe],
+                            volume: new BN(trade.baseTokenAmount),
+                        },
+                        {
+                            candleCollection: SWAP_COLLECTIONS.candleCollections[this.assetTokenAddress][this.baseTokenAddress][timeframe],
+                            volume: new BN(trade.assetTokenAmount),
+                        }
+                    ].map(async ({ candleCollection, volume }) => {
+                        const openTimestamp = Math.floor(trade.timestamp / timeframe) * timeframe;
+                        const candle = await candleCollection.findOne({ openTimestamp });
+                        
+                        // Simple update - just deduct the volume from the existing candle
+                        // Possible TODO: Add in more fine-grained removal - Track the highest, lowest and close prices to see if they
+                        // need updating too.
+                        if (candle) {
+                            candle.volume = new BN(candle.volume).sub(volume);
+                            candleCollection.updateOne({ openTimestamp }, candle);
+                        }
+                    })
+                )
+            )
         );
     }
 }

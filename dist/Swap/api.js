@@ -30,14 +30,15 @@ class SwapApi {
                     from: lodash_1.isString(req.query.from) ? parseFloat(req.query.from) : undefined,
                     to: lodash_1.isString(req.query.to) ? parseFloat(req.query.to) : Date.now(),
                     limit: lodash_1.isString(req.query.limit) ? parseFloat(req.query.limit) : 150,
+                    user: lodash_1.isString(req.query.user) ? req.query.user : undefined,
                 };
                 const tradeHistoryCollection = collections_1.SWAP_COLLECTIONS.tradeHistoryCollections[query.exchangeContract];
                 const trades = yield tradeHistoryCollection
-                    .find(utils_1.removeEmptyFields({ timestamp: { $gte: query.from, $lt: query.to } }))
-                    .sort({ timestamp: 1 })
+                    .find(utils_1.removeEmptyFields({ timestamp: { $gte: query.from, $lt: query.to }, user: query.user }))
+                    .sort({ timestamp: -1 })
                     .limit(Math.min(query.limit, 500)) // Max of 500
                     .toArray();
-                res.json(JSON.stringify(trades));
+                res.json(trades);
             }));
         });
     }
@@ -46,19 +47,20 @@ class SwapApi {
             api_1.GLOBAL_API.app.get(`${SwapApi.URL_PREFIX}candles`, (req, res) => __awaiter(this, void 0, void 0, function* () {
                 var _a;
                 const query = {
-                    exchangeContract: lodash_1.isString(req.query.exchangeContract) ? req.query.exchangeContract : "",
-                    timeframe: (_a = (lodash_1.isString(req.query.timeframe) ? constants_1.Timeframes[req.query.timeframe] : constants_1.Timeframes["15m"])) !== null && _a !== void 0 ? _a : constants_1.Timeframes["15m"],
+                    baseTokenAddress: lodash_1.isString(req.query.baseTokenAddress) ? req.query.baseTokenAddress : "",
+                    assetTokenAddress: lodash_1.isString(req.query.assetTokenAddress) ? req.query.assetTokenAddress : "",
+                    timeframe: (_a = (lodash_1.isString(req.query.timeframe) ? constants_1.TIMEFRAMES[req.query.timeframe] : constants_1.TIMEFRAMES["15m"])) !== null && _a !== void 0 ? _a : constants_1.TIMEFRAMES["15m"],
                     from: lodash_1.isString(req.query.from) ? parseFloat(req.query.from) : undefined,
                     to: lodash_1.isString(req.query.to) ? parseFloat(req.query.to) : Date.now(),
                     limit: lodash_1.isString(req.query.limit) ? parseFloat(req.query.limit) : 150,
                 };
-                const candleCollection = collections_1.SWAP_COLLECTIONS.candleCollections[query.exchangeContract][query.timeframe];
+                const candleCollection = collections_1.SWAP_COLLECTIONS.candleCollections[query.baseTokenAddress][query.assetTokenAddress][query.timeframe];
                 const candles = yield candleCollection
                     .find(utils_1.removeEmptyFields({ openTimestamp: { $gte: query.from, $lt: query.to } }))
-                    .sort({ openTimestamp: 1 })
+                    .sort({ openTimestamp: -1 })
                     .limit(Math.min(query.limit, 500)) // Max of 500
                     .toArray();
-                res.json(JSON.stringify(candles));
+                res.json(candles);
             }));
         });
     }

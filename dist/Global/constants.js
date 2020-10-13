@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Timeframes = void 0;
-exports.Timeframes = {
+exports.TIMEFRAMES = void 0;
+exports.TIMEFRAMES = {
     ["1m"]: 1000 * 60,
     ["15m"]: 1000 * 60 * 15,
     ["4h"]: 1000 * 60 * 60 * 4,
