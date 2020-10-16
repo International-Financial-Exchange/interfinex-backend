@@ -9,17 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const swap_1 = require("./Swap/swap");
-const database_1 = require("./Global/database");
-require("./Global/utils");
-const api_1 = require("./Global/api");
-const api_2 = require("./Swap/api");
-require("./ENV");
-const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield database_1.DATABASE.init();
-    yield swap_1.SWAP.start();
-    yield api_1.GLOBAL_API.start();
-    yield api_2.SWAP_API.start();
-});
-main();
-//# sourceMappingURL=index.js.map
+exports.DATABASE = void 0;
+const { MongoClient } = require("mongodb");
+const client = new MongoClient("mongodb://localhost:27017", { useUnifiedTopology: true });
+class Database {
+    init() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield client.connect();
+            this.db = client.db(Database.DB_NAME);
+            console.log("Connected to mongo server");
+        });
+    }
+}
+Database.DB_NAME = "INTERMEX";
+exports.DATABASE = new Database();
+//# sourceMappingURL=database.js.map

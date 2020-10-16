@@ -1,4 +1,11 @@
 "use strict";
+// import { SWAP } from "./Swap/swap"
+// import { DATABASE } from "./Global/database";
+// import "./Global/utils";
+// import { GLOBAL_API } from "./Global/api";
+// import { SWAP_API } from "./Swap/api";
+// import "./ENV";
+// import { ETH_NODE_URL } from "./ENV";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,18 +15,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const swap_1 = require("./Swap/swap");
-const database_1 = require("./Global/database");
-require("./Global/utils");
-const api_1 = require("./Global/api");
-const api_2 = require("./Swap/api");
-require("./ENV");
+console.log("hello");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield database_1.DATABASE.init();
-    yield swap_1.SWAP.start();
-    yield api_1.GLOBAL_API.start();
-    yield api_2.SWAP_API.start();
+    // console.log("eth url", ETH_NODE_URL);
+    // await DATABASE.init();
+    // await SWAP.start();
+    // await GLOBAL_API.start();
+    // await SWAP_API.start();
 });
 main();
 //# sourceMappingURL=index.js.map

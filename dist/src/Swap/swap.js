@@ -9,17 +9,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const swap_1 = require("./Swap/swap");
-const database_1 = require("./Global/database");
-require("./Global/utils");
-const api_1 = require("./Global/api");
-const api_2 = require("./Swap/api");
-require("./ENV");
-const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield database_1.DATABASE.init();
-    yield swap_1.SWAP.start();
-    yield api_1.GLOBAL_API.start();
-    yield api_2.SWAP_API.start();
-});
-main();
-//# sourceMappingURL=index.js.map
+exports.SWAP = void 0;
+const all_exchanges_1 = require("./all_exchanges");
+const factory_1 = require("./factory");
+const collections_1 = require("./collections");
+class Swap {
+    constructor() {
+    }
+    start() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield collections_1.SWAP_COLLECTIONS.init();
+            yield factory_1.FACTORY.start();
+            yield all_exchanges_1.ALL_EXCHANGES.start();
+        });
+    }
+}
+exports.SWAP = new Swap();
+//# sourceMappingURL=swap.js.map
