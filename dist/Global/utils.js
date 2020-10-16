@@ -18,14 +18,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.isObject = exports.removeEmptyFields = exports.newContract = void 0;
-const ethers_1 = require("./ethers");
-const ethers_2 = require("ethers");
-const _ = __importStar(require("lodash"));
-exports.newContract = (address, abi) => {
-    return new ethers_2.ethers.Contract(address, abi, ethers_1.provider);
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getTokenDecimals = exports.humanizeTokenAmount = exports.isObject = exports.removeEmptyFields = void 0;
+const _ = __importStar(require("lodash"));
+const ethers_1 = require("ethers");
 // Empty out all keys in an object that have a field of undefined
 exports.removeEmptyFields = ($obj) => {
     for (const k of Object.keys($obj)) {
@@ -37,6 +42,12 @@ exports.removeEmptyFields = ($obj) => {
     return $obj;
 };
 exports.isObject = (item) => typeof item === "object" && !Array.isArray(item) && item !== null;
+exports.humanizeTokenAmount = (amount, decimals) => parseFloat(ethers_1.ethers.utils.formatUnits(amount, decimals));
+// Default decimals to 18 if a contract does not implement decimals
+exports.getTokenDecimals = (token) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d;
+    return parseFloat((_d = (yield (((_a = token.methods) === null || _a === void 0 ? void 0 : _a.decimals().call()) || ((_b = token.methods) === null || _b === void 0 ? void 0 : _b.DECIMALS().call()) || ((_c = token.methods) === null || _c === void 0 ? void 0 : _c.Decimals().call())))) !== null && _d !== void 0 ? _d : 18);
+});
 Array.prototype.last = function () {
     return _.cloneDeep(this[this.length - 1]);
 };

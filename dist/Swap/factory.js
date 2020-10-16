@@ -17,11 +17,15 @@ const Factory_json_1 = __importDefault(require("./contracts/Factory.json"));
 const ethers_1 = require("ethers");
 const ethers_2 = require("../Global/ethers");
 const Exchange_json_1 = __importDefault(require("./contracts/Exchange.json"));
+const ERC20_json_1 = __importDefault(require("./contracts/ERC20.json"));
 const collections_1 = require("./collections");
 const web3_1 = require("../Global/web3");
+const utils_1 = require("../Global/utils");
+const events_1 = require("events");
 class Factory {
     constructor() {
         this.factoryContract = web3_1.newContract(Factory_json_1.default.abi, Factory_json_1.default.address);
+        this.events = new events_1.EventEmitter();
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -34,40 +38,49 @@ class Factory {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`   ⛏️  Initialising ${collections_1.EXCHANGES_COLL_NAME} collection`);
             const exchange_count = parseFloat(yield this.factoryContract.methods.exchange_count().call());
-            const pairs = yield Promise.all(Array.from(Array(exchange_count).keys())
+            const createdExchanges = (yield Promise.all(Array.from(Array(exchange_count).keys())
                 .map((exchange_id) => __awaiter(this, void 0, void 0, function* () {
                 const exchangeAddress = yield this.factoryContract.methods.id_to_exchange(exchange_id).call();
-                const exchange = new ethers_1.ethers.Contract(exchangeAddress, Exchange_json_1.default.abi, ethers_2.provider);
-                const [baseTokenAddress, assetTokenAddress] = [
-                    yield exchange.base_token({ gasLimit: 100000 }),
-                    yield exchange.asset_token({ gasLimit: 100000 })
-                ];
-                // If more fine-grained details about the tokens are needed then we can get the token contracts here
-                // const [baseToken, assetToken] = [
-                //     new ethers.Contract(baseTokenAddress, erc20Contract.abi as any, provider), 
-                //     new ethers.Contract(assetTokenAddress, erc20Contract.abi as any, provider),
-                // ];
-                return {
-                    baseTokenAddress,
-                    assetTokenAddress,
-                    exchangeAddress,
-                };
-            })));
-            // Update 'swap.exchanges' so that it contains all of the exchanges
-            yield Promise.all(pairs.map(({ baseTokenAddress, assetTokenAddress, exchangeAddress }) => collections_1.SWAP_COLLECTIONS.exchangesCollection.updateOne({ baseTokenAddress, assetTokenAddress }, { "$set": { exchangeAddress } }, { upsert: true })));
+                if (!(yield collections_1.SWAP_COLLECTIONS.exchangesCollection.findOne({ exchangeAddress }))) {
+                    yield this.addExchange(exchangeAddress);
+                    return true;
+                }
+                return false;
+            })))).filter(v => v);
+            console.log(`   ⛏️  Inserted ${createdExchanges.length} new swap exchanges`);
+        });
+    }
+    addExchange(exchangeAddress) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`   ⛏️  Inserting new swap exchange for: ${exchangeAddress}`);
+            const exchange = new ethers_1.ethers.Contract(exchangeAddress, Exchange_json_1.default.abi, ethers_2.provider);
+            const [baseTokenAddress, assetTokenAddress] = [
+                yield exchange.base_token({ gasLimit: 100000 }),
+                yield exchange.asset_token({ gasLimit: 100000 })
+            ];
+            const [baseToken, assetToken] = [
+                web3_1.newContract(ERC20_json_1.default.abi, baseTokenAddress),
+                web3_1.newContract(ERC20_json_1.default.abi, assetTokenAddress),
+            ];
+            const [assetTokenDecimals, baseTokenDecimals] = [
+                yield utils_1.getTokenDecimals(assetToken),
+                yield utils_1.getTokenDecimals(baseToken),
+            ];
+            return collections_1.SWAP_COLLECTIONS.exchangesCollection.updateOne({ baseTokenAddress, assetTokenAddress, assetTokenDecimals, baseTokenDecimals }, { "$set": { exchangeAddress } }, { upsert: true });
         });
     }
     startExchangeCreationListener() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`   🎧 Starting swap exchange creation listener`);
             this.factoryContract.events.NewExchange()
-                .on("data", ({ returnValues: { base_token, asset_token, contract } }) => __awaiter(this, void 0, void 0, function* () {
-                console.log(`   ⛏️  Inserting new swap exchange for: ${contract}`);
-                collections_1.SWAP_COLLECTIONS.exchangesCollection.updateOne({ baseTokenAddress: base_token, assetTokenAddress: asset_token }, { "$set": { exchangeAddress: contract } }, { upsert: true });
+                .on("data", ({ returnValues: { exchange_contract } }) => __awaiter(this, void 0, void 0, function* () {
+                yield this.addExchange(exchange_contract);
+                this.events.emit("NewExchange", { exchangeAddress: exchange_contract });
             }))
-                .on("changed", ({ returnValues: { contract } }) => __awaiter(this, void 0, void 0, function* () {
+                .on("changed", ({ returnValues: { exchange_contract } }) => __awaiter(this, void 0, void 0, function* () {
                 console.log(`   ⛏️  Chain reorg - Removing swap exchange`);
-                collections_1.SWAP_COLLECTIONS.exchangesCollection.deleteOne({ exchangeAddress: contract });
+                yield collections_1.SWAP_COLLECTIONS.exchangesCollection.deleteOne({ exchangeAddress: exchange_contract });
+                this.events.emit("RemovedExchange", { exchangeAddress: exchange_contract });
             }));
         });
     }

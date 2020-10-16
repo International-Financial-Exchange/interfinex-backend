@@ -46,18 +46,19 @@ class SwapApi {
         return __awaiter(this, void 0, void 0, function* () {
             api_1.GLOBAL_API.app.get(`${SwapApi.URL_PREFIX}candles`, (req, res) => __awaiter(this, void 0, void 0, function* () {
                 var _a;
+                console.log(req.query);
                 const query = {
                     baseTokenAddress: lodash_1.isString(req.query.baseTokenAddress) ? req.query.baseTokenAddress : "",
                     assetTokenAddress: lodash_1.isString(req.query.assetTokenAddress) ? req.query.assetTokenAddress : "",
-                    timeframe: (_a = (lodash_1.isString(req.query.timeframe) ? constants_1.TIMEFRAMES[req.query.timeframe] : constants_1.TIMEFRAMES["15m"])) !== null && _a !== void 0 ? _a : constants_1.TIMEFRAMES["15m"],
+                    timeframe: (_a = (lodash_1.isString(req.query.timeframe) ? parseFloat(req.query.timeframe) : constants_1.TIMEFRAMES["15m"])) !== null && _a !== void 0 ? _a : constants_1.TIMEFRAMES["15m"],
                     from: lodash_1.isString(req.query.from) ? parseFloat(req.query.from) : undefined,
                     to: lodash_1.isString(req.query.to) ? parseFloat(req.query.to) : Date.now(),
                     limit: lodash_1.isString(req.query.limit) ? parseFloat(req.query.limit) : 150,
                 };
                 const candleCollection = collections_1.SWAP_COLLECTIONS.candleCollections[query.baseTokenAddress][query.assetTokenAddress][query.timeframe];
                 const candles = yield candleCollection
-                    .find(utils_1.removeEmptyFields({ openTimestamp: { $gte: query.from, $lt: query.to } }))
-                    .sort({ openTimestamp: -1 })
+                    .find(utils_1.removeEmptyFields({ openTimestamp: { $gt: query.from, $lte: query.to } }))
+                    .sort({ openTimestamp: 1 })
                     .limit(Math.min(query.limit, 500)) // Max of 500
                     .toArray();
                 res.json(candles);

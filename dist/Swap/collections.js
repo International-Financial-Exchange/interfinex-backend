@@ -36,10 +36,12 @@ class SwapCollections {
                 "validator": {
                     "$jsonSchema": {
                         "bsonType": "object",
-                        "required": ["assetTokenAddress", "baseTokenAddress", "exchangeAddress"],
+                        "required": ["assetTokenAddress", "baseTokenAddress", "exchangeAddress", "baseTokenDecimals", "assetTokenDecimals"],
                         "properties": {
                             "assetTokenAddress": { "bsonType": "string" },
                             "baseTokenAddress": { "bsonType": "string" },
+                            "assetTokenDecimals": { "bsonType": "int" },
+                            "baseTokenDecimals": { "bsonType": "int" },
                             "exchangeAddress": { "bsonType": "string" }
                         }
                     }
@@ -90,11 +92,11 @@ class SwapCollections {
                                 "bsonType": "object",
                                 "required": ["high", "low", "open", "close", "volume", "openTimestamp"],
                                 "properties": {
-                                    "high": { "bsonType": "string" },
-                                    "low": { "bsonType": "string" },
-                                    "open": { "bsonType": "string" },
-                                    "close": { "bsonType": "string" },
-                                    "volume": { "bsonType": "string" },
+                                    "high": { "bsonType": ["int", "double"] },
+                                    "low": { "bsonType": ["int", "double"] },
+                                    "open": { "bsonType": ["int", "double"] },
+                                    "close": { "bsonType": ["int", "double"] },
+                                    "volume": { "bsonType": ["int", "double"] },
                                     "openTimestamp": { "bsonType": "double" },
                                 }
                             }
