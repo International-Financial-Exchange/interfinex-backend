@@ -1,5 +1,5 @@
 import parseArgs from "minimist";
-import ENV from "../.env.json";
+import ENV from "./.env.json";
 
 const enum Network {
     dev = "dev",

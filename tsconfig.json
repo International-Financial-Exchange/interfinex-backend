@@ -2,7 +2,7 @@
     "extends": "@tsconfig/recommended/tsconfig.json",
 
     "compilerOptions": {
-        "outDir": "dist",
+        "outDir": "./dist",
         "sourceMap": true,
         "alwaysStrict": true,
         "noImplicitAny": true,
