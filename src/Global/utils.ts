@@ -17,7 +17,6 @@ export const removeEmptyFields = ($obj: { [key: string]: any }) => {
 export const isObject = (item: any) => typeof item === "object" && !Array.isArray(item) && item !== null;
 export const humanizeTokenAmount = (amount: string, decimals: number) => parseFloat(ethers.utils.formatUnits(amount, decimals));
 
-
 // Default decimals to 18 if a contract does not implement decimals
 export const getTokenDecimals = async (token: any) => parseFloat(
     (await (token.methods?.decimals().call() || token.methods?.DECIMALS().call() || token.methods?.Decimals().call())) ?? 18

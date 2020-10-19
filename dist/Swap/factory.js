@@ -14,8 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FACTORY = void 0;
 const Factory_json_1 = __importDefault(require("./contracts/Factory.json"));
-const ethers_1 = require("ethers");
-const ethers_2 = require("../Global/ethers");
 const Exchange_json_1 = __importDefault(require("./contracts/Exchange.json"));
 const ERC20_json_1 = __importDefault(require("./contracts/ERC20.json"));
 const collections_1 = require("./collections");
@@ -53,10 +51,10 @@ class Factory {
     addExchange(exchangeAddress) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`   ⛏️  Inserting new swap exchange for: ${exchangeAddress}`);
-            const exchange = new ethers_1.ethers.Contract(exchangeAddress, Exchange_json_1.default.abi, ethers_2.provider);
+            const exchange = web3_1.newContract(Exchange_json_1.default.abi, exchangeAddress);
             const [baseTokenAddress, assetTokenAddress] = [
-                yield exchange.base_token({ gasLimit: 100000 }),
-                yield exchange.asset_token({ gasLimit: 100000 })
+                yield exchange.methods.base_token().call(),
+                yield exchange.methods.asset_token().call()
             ];
             const [baseToken, assetToken] = [
                 web3_1.newContract(ERC20_json_1.default.abi, baseTokenAddress),

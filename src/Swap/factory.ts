@@ -1,6 +1,4 @@
 import factoryArtifact from "./contracts/Factory.json";
-import { ethers } from "ethers";
-import { provider } from "../Global/ethers";
 import exchangeArtifact from "./contracts/Exchange.json";
 import erc20Artifact from "./contracts/ERC20.json"
 import { SWAP_COLLECTIONS, EXCHANGES_COLL_NAME } from "./collections";
@@ -41,10 +39,10 @@ class Factory {
 
     async addExchange(exchangeAddress: string) {
         console.log(`   ⛏️  Inserting new swap exchange for: ${exchangeAddress}`);
-        const exchange = new ethers.Contract(exchangeAddress, exchangeArtifact.abi as any, provider);
+        const exchange = newContract(exchangeArtifact.abi, exchangeAddress);
         const [baseTokenAddress, assetTokenAddress] = [
-            await exchange.base_token({ gasLimit: 100000 }), 
-            await exchange.asset_token({ gasLimit: 100000 })
+            await exchange.methods.base_token().call(), 
+            await exchange.methods.asset_token().call()
         ];
         
         const [baseToken, assetToken] = [
