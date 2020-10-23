@@ -21,7 +21,7 @@ export const humanizeTokenAmount = (amount: string, decimals: number) => parseFl
 export const getTokenDecimals = async (token: any) => {
     const decimals = await token.methods.decimals().call()
         .catch(() => token.methods.DECIMALS().call())
-        .catch(() => token.methods.Decimals.call())
+        .catch(() => token.methods.Decimals().call())
         .catch(() => 18);
 
     parseFloat(decimals);
