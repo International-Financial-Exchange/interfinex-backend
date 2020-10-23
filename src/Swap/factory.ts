@@ -13,6 +13,7 @@ class Factory {
         console.log(`\n🏁 Starting Swap Factory at: ${this.factoryContract.options.address}`);
 
         await this.initExchangesCollection();
+        console.log("hello")
         await this.startExchangeCreationListener();
     }
 
@@ -34,6 +35,20 @@ class Factory {
         )).filter(v => v);
 
         console.log(`   ⛏️  Inserted ${createdExchanges.length} new swap exchanges`);
+    }
+
+    async startExchangeCreationListener() {
+        console.log(`   🎧 Starting swap exchange creation listener`);
+        this.factoryContract.events.NewExchange()
+            .on("data", async ({ returnValues: { exchange_contract }}: any) => {
+                await this.addExchange(exchange_contract);
+                this.events.emit("NewExchange", { exchangeAddress: exchange_contract });
+            })
+            .on("changed", async ({ returnValues: { exchange_contract }}: any) => {
+                console.log(`   ⛏️  Chain reorg - Removing swap exchange`);
+                await SWAP_COLLECTIONS.exchangesCollection.deleteOne({ exchangeAddress: exchange_contract });
+                this.events.emit("RemovedExchange", { exchangeAddress: exchange_contract });
+            });
     }
 
     async addExchange(exchangeAddress: string) {
@@ -59,20 +74,6 @@ class Factory {
             { "$set": { exchangeAddress }},
             { upsert: true },
         );
-    }
-    
-    async startExchangeCreationListener() {
-        console.log(`   🎧 Starting swap exchange creation listener`);
-        this.factoryContract.events.NewExchange()
-            .on("data", async ({ returnValues: { exchange_contract }}: any) => {
-                await this.addExchange(exchange_contract);
-                this.events.emit("NewExchange", { exchangeAddress: exchange_contract });
-            })
-            .on("changed", async ({ returnValues: { exchange_contract }}: any) => {
-                console.log(`   ⛏️  Chain reorg - Removing swap exchange`);
-                await SWAP_COLLECTIONS.exchangesCollection.deleteOne({ exchangeAddress: exchange_contract });
-                this.events.emit("RemovedExchange", { exchangeAddress: exchange_contract });
-            });
     }
 }
 

@@ -24,7 +24,7 @@ export const getTokenDecimals = async (token: any) => {
         .catch(() => token.methods.Decimals().call())
         .catch(() => 18);
 
-    parseFloat(decimals);
+    return parseFloat(decimals);
 }
 
 declare global {

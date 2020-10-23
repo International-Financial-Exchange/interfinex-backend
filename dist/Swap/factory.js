@@ -27,8 +27,9 @@ class Factory {
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(`\n🏁 Starting Swap Factory`);
+            console.log(`\n🏁 Starting Swap Factory at: ${this.factoryContract.options.address}`);
             yield this.initExchangesCollection();
+            console.log("hello");
             yield this.startExchangeCreationListener();
         });
     }
@@ -48,6 +49,21 @@ class Factory {
             console.log(`   ⛏️  Inserted ${createdExchanges.length} new swap exchanges`);
         });
     }
+    startExchangeCreationListener() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`   🎧 Starting swap exchange creation listener`);
+            this.factoryContract.events.NewExchange()
+                .on("data", ({ returnValues: { exchange_contract } }) => __awaiter(this, void 0, void 0, function* () {
+                yield this.addExchange(exchange_contract);
+                this.events.emit("NewExchange", { exchangeAddress: exchange_contract });
+            }))
+                .on("changed", ({ returnValues: { exchange_contract } }) => __awaiter(this, void 0, void 0, function* () {
+                console.log(`   ⛏️  Chain reorg - Removing swap exchange`);
+                yield collections_1.SWAP_COLLECTIONS.exchangesCollection.deleteOne({ exchangeAddress: exchange_contract });
+                this.events.emit("RemovedExchange", { exchangeAddress: exchange_contract });
+            }));
+        });
+    }
     addExchange(exchangeAddress) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`   ⛏️  Inserting new swap exchange for: ${exchangeAddress}`);
@@ -65,21 +81,6 @@ class Factory {
                 yield utils_1.getTokenDecimals(baseToken),
             ];
             return collections_1.SWAP_COLLECTIONS.exchangesCollection.updateOne({ baseTokenAddress, assetTokenAddress, assetTokenDecimals, baseTokenDecimals }, { "$set": { exchangeAddress } }, { upsert: true });
-        });
-    }
-    startExchangeCreationListener() {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log(`   🎧 Starting swap exchange creation listener`);
-            this.factoryContract.events.NewExchange()
-                .on("data", ({ returnValues: { exchange_contract } }) => __awaiter(this, void 0, void 0, function* () {
-                yield this.addExchange(exchange_contract);
-                this.events.emit("NewExchange", { exchangeAddress: exchange_contract });
-            }))
-                .on("changed", ({ returnValues: { exchange_contract } }) => __awaiter(this, void 0, void 0, function* () {
-                console.log(`   ⛏️  Chain reorg - Removing swap exchange`);
-                yield collections_1.SWAP_COLLECTIONS.exchangesCollection.deleteOne({ exchangeAddress: exchange_contract });
-                this.events.emit("RemovedExchange", { exchangeAddress: exchange_contract });
-            }));
         });
     }
 }

@@ -45,8 +45,11 @@ exports.isObject = (item) => typeof item === "object" && !Array.isArray(item) &&
 exports.humanizeTokenAmount = (amount, decimals) => parseFloat(ethers_1.ethers.utils.formatUnits(amount, decimals));
 // Default decimals to 18 if a contract does not implement decimals
 exports.getTokenDecimals = (token) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d;
-    return parseFloat((_d = (yield (((_a = token.methods) === null || _a === void 0 ? void 0 : _a.decimals().call()) || ((_b = token.methods) === null || _b === void 0 ? void 0 : _b.DECIMALS().call()) || ((_c = token.methods) === null || _c === void 0 ? void 0 : _c.Decimals().call())))) !== null && _d !== void 0 ? _d : 18);
+    const decimals = yield token.methods.decimals().call()
+        .catch(() => token.methods.DECIMALS().call())
+        .catch(() => token.methods.Decimals().call())
+        .catch(() => 18);
+    return parseFloat(decimals);
 });
 Array.prototype.last = function () {
     return _.cloneDeep(this[this.length - 1]);
