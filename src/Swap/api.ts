@@ -52,8 +52,6 @@ class SwapApi {
         };
 
         GLOBAL_API.app.get(`${SwapApi.URL_PREFIX}candles`, async (req, res) => {
-            console.log(req.query);
-
             const query: CandleQuery = {
                 baseTokenAddress: isString(req.query.baseTokenAddress) ? req.query.baseTokenAddress : "",
                 assetTokenAddress: isString(req.query.assetTokenAddress) ? req.query.assetTokenAddress : "",

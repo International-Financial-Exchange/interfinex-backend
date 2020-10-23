@@ -23,6 +23,10 @@ class GlobalApi {
         return __awaiter(this, void 0, void 0, function* () {
             // TODO: This is unsafe! Change to only allow some origins
             this.app.use(cors_1.default());
+            this.app.get("/", (req, res) => {
+                console.log("hello");
+                res.send("hello");
+            });
             this.app.listen(GlobalApi.PORT, () => {
                 console.log(`\n🚀 API started and listening at port: ${GlobalApi.PORT}\n`);
             });

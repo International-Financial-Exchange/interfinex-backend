@@ -5,13 +5,12 @@ import { SWAP_COLLECTIONS, EXCHANGES_COLL_NAME } from "./collections";
 import { newContract } from "../Global/web3";
 import { getTokenDecimals } from "../Global/utils";
 import { EventEmitter } from "events";
-
 class Factory {
     public factoryContract = newContract(factoryArtifact.abi, factoryArtifact.address);
     public events = new EventEmitter();
 
     async start() {
-        console.log(`\n🏁 Starting Swap Factory`);
+        console.log(`\n🏁 Starting Swap Factory at: ${this.factoryContract.options.address}`);
 
         await this.initExchangesCollection();
         await this.startExchangeCreationListener();

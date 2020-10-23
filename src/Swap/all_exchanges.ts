@@ -100,7 +100,6 @@ class Exchange {
         this.baseTokenDecimals = baseTokenDecimals;
         this.assetTokenDecimals = assetTokenDecimals;
 
-        console.log(this.baseTokenAddress, this.assetTokenAddress)
         await SWAP_COLLECTIONS.addTradeHistoryCollection(this.contract.options.address);
         await SWAP_COLLECTIONS.addCandleCollection(this.baseTokenAddress, this.assetTokenAddress);
         await SWAP_COLLECTIONS.addCandleCollection(this.assetTokenAddress, this.baseTokenAddress);
@@ -152,8 +151,6 @@ class Exchange {
     }
 
     async addTradeToCandles(trade: Trade) {
-        const { assetTokenDecimals, baseTokenDecimals } = await SWAP_COLLECTIONS.exchangesCollection.findOne({ exchangeAddress: this.contract.options.address });
-        console.log(assetTokenDecimals, baseTokenDecimals);
         Promise.all(
             SwapCollections.candleTimeframes.map(async ({ timeframe }) => {
                 // Insert candles for base/asset and asset/base

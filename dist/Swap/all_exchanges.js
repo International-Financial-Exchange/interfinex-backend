@@ -75,7 +75,6 @@ class Exchange {
             this.assetTokenAddress = assetTokenAddress;
             this.baseTokenDecimals = baseTokenDecimals;
             this.assetTokenDecimals = assetTokenDecimals;
-            console.log(this.baseTokenAddress, this.assetTokenAddress);
             yield collections_1.SWAP_COLLECTIONS.addTradeHistoryCollection(this.contract.options.address);
             yield collections_1.SWAP_COLLECTIONS.addCandleCollection(this.baseTokenAddress, this.assetTokenAddress);
             yield collections_1.SWAP_COLLECTIONS.addCandleCollection(this.assetTokenAddress, this.baseTokenAddress);
@@ -130,8 +129,6 @@ class Exchange {
     }
     addTradeToCandles(trade) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { assetTokenDecimals, baseTokenDecimals } = yield collections_1.SWAP_COLLECTIONS.exchangesCollection.findOne({ exchangeAddress: this.contract.options.address });
-            console.log(assetTokenDecimals, baseTokenDecimals);
             Promise.all(collections_1.SwapCollections.candleTimeframes.map(({ timeframe }) => __awaiter(this, void 0, void 0, function* () {
                 // Insert candles for base/asset and asset/base
                 const assetTokenAmount = utils_1.humanizeTokenAmount(trade.assetTokenAmount, this.assetTokenDecimals);
