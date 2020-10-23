@@ -18,9 +18,14 @@ export const isObject = (item: any) => typeof item === "object" && !Array.isArra
 export const humanizeTokenAmount = (amount: string, decimals: number) => parseFloat(ethers.utils.formatUnits(amount, decimals));
 
 // Default decimals to 18 if a contract does not implement decimals
-export const getTokenDecimals = async (token: any) => parseFloat(
-    (await (token.methods?.decimals().call() || token.methods?.DECIMALS().call() || token.methods?.Decimals().call())) ?? 18
-);
+export const getTokenDecimals = async (token: any) => {
+    const decimals = await token.methods.decimals().call()
+        .catch(() => token.methods.DECIMALS().call())
+        .catch(() => token.methods.Decimals.call())
+        .catch(() => 18);
+
+    parseFloat(decimals);
+}
 
 declare global {
     interface Array<T> {
