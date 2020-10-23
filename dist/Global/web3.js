@@ -7,6 +7,7 @@ exports.newContract = exports.web3 = void 0;
 const web3_1 = __importDefault(require("web3"));
 const ENV_1 = require("../ENV");
 const web3_providers_ws_1 = __importDefault(require("web3-providers-ws"));
+console.log(`Utilising Eth Node: ${ENV_1.ETH_NODE_URL}`);
 // @ts-ignore
 // Required so that we can reconnect to websocket while listening to events instead of timing out
 const wsProvider = new web3_providers_ws_1.default(ENV_1.ETH_NODE_URL, {

@@ -29,7 +29,6 @@ class Factory {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`\n🏁 Starting Swap Factory at: ${this.factoryContract.options.address}`);
             yield this.initExchangesCollection();
-            console.log("hello");
             yield this.startExchangeCreationListener();
         });
     }
