@@ -270,7 +270,7 @@
             "constant":true
         },
         {
-            "name":"decimals",
+            "name":"deci mals",
             "outputs":[
                 {
                     "type":"uint256",

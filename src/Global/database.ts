@@ -6,7 +6,7 @@ const client = new MongoClient(
 
 class Database {
     public db: any;
-    static DB_NAME = "INTERMEX";
+    static DB_NAME = "INTERFINEX";
     
     async init() {
         console.log("Connecting to mongo server");
