@@ -286,7 +286,7 @@
             "constant":true
         },
         {
-            "name":"DECIMALS",
+            "name":"Decimals",
             "outputs":[
                 {
                     "type":"uint256",
@@ -302,7 +302,7 @@
             "constant":true
         },
         {
-            "name":"Decimals",
+            "name":"DECIMALS",
             "outputs":[
                 {
                     "type":"uint256",
