@@ -22,6 +22,6 @@ class Database {
         });
     }
 }
-Database.DB_NAME = "INTERMEX";
+Database.DB_NAME = "INTERFINEX";
 exports.DATABASE = new Database();
 //# sourceMappingURL=database.js.map
