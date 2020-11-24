@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ALL_EXCHANGES = void 0;
 const collections_1 = require("./collections");
 const factory_1 = require("./factory");
-const Exchange_json_1 = __importDefault(require("./contracts/Exchange.json"));
 const web3_1 = require("../Global/web3");
 const web3_2 = __importDefault(require("web3"));
 const utils_1 = require("../Global/utils");
@@ -45,7 +44,7 @@ class AllExchanges {
             });
             const listeners = yield Promise.all(exchanges.map(({ exchangeAddress, assetTokenAddress, baseTokenAddress }) => __awaiter(this, void 0, void 0, function* () { return this.addExchange(exchangeAddress); })));
             console.log(`   🎧 Listening to ${listeners.length} swap exchanges`);
-            console.log(`   DEV: Deployed Exchanges:`, exchanges);
+            // console.log(`   DEV: Deployed Exchanges:`, exchanges);
         });
     }
     addExchange(contract) {
@@ -66,7 +65,7 @@ class AllExchanges {
 }
 class Exchange {
     constructor(contractAddress) {
-        this.contract = web3_1.newContract(Exchange_json_1.default.abi, contractAddress);
+        this.contract = web3_1.newContract("SwapExchange", contractAddress);
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -75,7 +74,6 @@ class Exchange {
             this.assetTokenAddress = assetTokenAddress;
             this.baseTokenDecimals = baseTokenDecimals;
             this.assetTokenDecimals = assetTokenDecimals;
-            console.log(this.baseTokenAddress, this.assetTokenAddress);
             yield collections_1.SWAP_COLLECTIONS.addTradeHistoryCollection(this.contract.options.address);
             yield collections_1.SWAP_COLLECTIONS.addCandleCollection(this.baseTokenAddress, this.assetTokenAddress);
             yield collections_1.SWAP_COLLECTIONS.addCandleCollection(this.assetTokenAddress, this.baseTokenAddress);
@@ -93,6 +91,7 @@ class Exchange {
         return __awaiter(this, void 0, void 0, function* () {
             this.swapEventEmitter = this.contract.events.Swap()
                 .on("data", (event) => __awaiter(this, void 0, void 0, function* () {
+                console.log("trade", event);
                 const trade = {
                     baseTokenAmount: event.returnValues.base_token_amount,
                     assetTokenAmount: event.returnValues.asset_token_amount,
@@ -130,8 +129,6 @@ class Exchange {
     }
     addTradeToCandles(trade) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { assetTokenDecimals, baseTokenDecimals } = yield collections_1.SWAP_COLLECTIONS.exchangesCollection.findOne({ exchangeAddress: this.contract.options.address });
-            console.log(assetTokenDecimals, baseTokenDecimals);
             Promise.all(collections_1.SwapCollections.candleTimeframes.map(({ timeframe }) => __awaiter(this, void 0, void 0, function* () {
                 // Insert candles for base/asset and asset/base
                 const assetTokenAmount = utils_1.humanizeTokenAmount(trade.assetTokenAmount, this.assetTokenDecimals);

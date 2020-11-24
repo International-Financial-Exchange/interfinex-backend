@@ -1,13 +1,11 @@
-import factoryArtifact from "./contracts/Factory.json";
-import exchangeArtifact from "./contracts/Exchange.json";
-import erc20Artifact from "./contracts/ERC20.json"
 import { SWAP_COLLECTIONS, EXCHANGES_COLL_NAME } from "./collections";
 import { newContract } from "../Global/web3";
 import { getTokenDecimals } from "../Global/utils";
 import { EventEmitter } from "events";
+import { CONTRACTS } from "../ENV";
 
 class Factory {
-    public factoryContract = newContract(factoryArtifact.abi, factoryArtifact.address);
+    public factoryContract = newContract("SwapFactory", CONTRACTS["SwapFactory"].address);
     public events = new EventEmitter();
 
     async start() {
@@ -53,15 +51,15 @@ class Factory {
 
     async addExchange(exchangeAddress: string) {
         console.log(`   ⛏️  Inserting new swap exchange for: ${exchangeAddress}`);
-        const exchange = newContract(exchangeArtifact.abi, exchangeAddress);
+        const exchange = newContract("SwapExchange", exchangeAddress);
         const [baseTokenAddress, assetTokenAddress] = [
             await exchange.methods.base_token().call(), 
             await exchange.methods.asset_token().call()
         ];
         
         const [baseToken, assetToken] = [
-            newContract(erc20Artifact.abi as any, baseTokenAddress), 
-            newContract(erc20Artifact.abi as any, assetTokenAddress), 
+            newContract("ERC20", baseTokenAddress), 
+            newContract("ERC20", assetTokenAddress), 
         ];
         
         const [assetTokenDecimals, baseTokenDecimals] = [

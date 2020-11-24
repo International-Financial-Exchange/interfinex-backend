@@ -46,7 +46,6 @@ class SwapApi {
         return __awaiter(this, void 0, void 0, function* () {
             api_1.GLOBAL_API.app.get(`${SwapApi.URL_PREFIX}candles`, (req, res) => __awaiter(this, void 0, void 0, function* () {
                 var _a;
-                console.log(req.query);
                 const query = {
                     baseTokenAddress: lodash_1.isString(req.query.baseTokenAddress) ? req.query.baseTokenAddress : "",
                     assetTokenAddress: lodash_1.isString(req.query.assetTokenAddress) ? req.query.assetTokenAddress : "",

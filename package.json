@@ -4,9 +4,10 @@
     "description": "",
     "main": "./dist/index.js",
     "scripts": {
-        "start-dev": "node ./dist/index.js --network=dev",
-        "start-kovan": "node ./dist/index.js --network=kovan",
-        "start-mainnet": "node ./dist/index.js --network=mainnet",
+        "start-localhost": "node ./dist/src/index.js --network=localhost",
+        "start-ganache": "node ./dist/src/index.js --network=ganache",
+        "start-kovan": "node ./dist/src/index.js --network=kovan",
+        "start-mainnet": "node ./dist/src/index.js --network=mainnet",
         "dev": "tsc --watch"
     },
     "keywords": [],

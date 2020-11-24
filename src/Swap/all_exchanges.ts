@@ -1,6 +1,5 @@
 import { SWAP_COLLECTIONS, SwapCollections } from "./collections";
 import { FACTORY } from "./factory";
-import exchangeArtifact from "./contracts/Exchange.json";
 import { newContract } from "../Global/web3";
 import { EventEmitter } from "events";
 import Web3 from "web3";
@@ -57,7 +56,7 @@ class AllExchanges {
         );
 
         console.log(`   🎧 Listening to ${listeners.length} swap exchanges`);
-        console.log(`   DEV: Deployed Exchanges:`, exchanges);
+        // console.log(`   DEV: Deployed Exchanges:`, exchanges);
     }
 
     async addExchange(contract: string) {
@@ -84,7 +83,7 @@ class Exchange {
     private tradeHistoryCollection: any;
 
     constructor(contractAddress: string) {
-        this.contract = newContract(exchangeArtifact.abi, contractAddress);
+        this.contract = newContract("SwapExchange", contractAddress);
     }
     
     async start() {
@@ -115,6 +114,8 @@ class Exchange {
     async startTradeListener() {
         this.swapEventEmitter = this.contract.events.Swap()
             .on("data", async (event: any) => {
+                console.log("trade", event);
+
                 const trade: Trade = {
                     baseTokenAmount: event.returnValues.base_token_amount,
                     assetTokenAmount: event.returnValues.asset_token_amount,

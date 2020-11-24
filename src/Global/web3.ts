@@ -1,5 +1,5 @@
 import Web3 from "web3";
-import { ETH_NODE_URL } from "../ENV";
+import { ETH_NODE_URL, getAbi } from "../ENV";
 import Web3WsProvider from "web3-providers-ws";
 
 console.log(`Utilising Eth Node: ${ETH_NODE_URL}`)
@@ -24,6 +24,6 @@ const wsProvider = new Web3WsProvider(ETH_NODE_URL, {
 
 export const web3 = new Web3(wsProvider);
 
-export const newContract = (abi: any, address: string) => {
-    return new web3.eth.Contract(abi, address);
+export const newContract = (abiName: string, address: string) => {
+    return new web3.eth.Contract(getAbi(abiName), address);
 };

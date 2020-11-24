@@ -8,31 +8,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GLOBAL_API = void 0;
-const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
-class GlobalApi {
+exports.MARGIN_SWAP = void 0;
+const factory_1 = require("./factory");
+const collections_1 = require("./collections");
+const all_margin_markets_1 = require("./all_margin_markets");
+class MarginSwap {
     constructor() {
-        this.app = express_1.default();
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
-            // TODO: This is unsafe! Change to only allow some origins
-            this.app.use(cors_1.default());
-            this.app.get("/", (req, res) => {
-                console.log("hello");
-                res.send("hello");
-            });
-            this.app.listen(GlobalApi.PORT, () => {
-                console.log(`\n🚀 API started and listening at port: ${GlobalApi.PORT}\n`);
-            });
+            yield collections_1.MARGIN_MARKET_COLLECTIONS.init();
+            yield factory_1.FACTORY.start();
+            yield all_margin_markets_1.ALL_MARGIN_MARKETS.start();
         });
     }
 }
-GlobalApi.PORT = 8080;
-exports.GLOBAL_API = new GlobalApi();
-//# sourceMappingURL=api.js.map
+exports.MARGIN_SWAP = new MarginSwap();
+//# sourceMappingURL=MarginSwap.js.map
