@@ -17,7 +17,8 @@ const collections_1 = require("./collections");
 const factory_1 = require("./factory");
 const web3_1 = require("../Global/web3");
 const web3_2 = __importDefault(require("web3"));
-// import { humanizeTokenAmount } from "../Global/utils";
+const utils_1 = require("../Global/utils");
+const collections_2 = require("../Swap/collections");
 //@ts-ignore
 const BN = web3_2.default.utils.BN;
 class AllMarginMarkets {
@@ -75,12 +76,19 @@ class MarginMarket {
             this.assetTokenAddress = assetTokenAddress;
             this.collateralTokenDecimals = collateralTokenDecimals;
             this.assetTokenDecimals = assetTokenDecimals;
-            // console.log(this);
+            const { exchangeAddress: swapExchangeAddress } = yield collections_2.SWAP_COLLECTIONS.exchangesCollection.findOne({
+                $or: [
+                    { assetTokenAddress, baseTokenAddress: collateralTokenAddress },
+                    { assetTokenAddress: collateralTokenAddress, baseTokenAddress: assetTokenAddress },
+                ]
+            });
+            this.swapExchange = web3_1.newContract("SwapExchange", swapExchangeAddress);
             yield collections_1.MARGIN_MARKET_COLLECTIONS.addFundingHistoryCollection(this.contract.options.address);
             this.fundingHistoryCollection = collections_1.MARGIN_MARKET_COLLECTIONS.fundingHistoryCollections[this.contract.options.address];
-            // await SWAP_COLLECTIONS.addCandleCollection(this.baseTokenAddress, this.assetTokenAddress);
-            // await SWAP_COLLECTIONS.addCandleCollection(this.assetTokenAddress, this.baseTokenAddress);
+            yield collections_1.MARGIN_MARKET_COLLECTIONS.addPositionsCollection(this.contract.options.address);
+            this.positionsCollection = collections_1.MARGIN_MARKET_COLLECTIONS.positionCollections[this.contract.options.address];
             yield this.startFundingListener();
+            yield this.startPositionsListener();
         });
     }
     stop() {
@@ -147,6 +155,38 @@ class MarginMarket {
     removeEventFromFundingHistory({ user, txId }) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.fundingHistoryCollection.deleteOne({ user, txId });
+        });
+    }
+    startPositionsListener() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const handlePositionChange = (event) => __awaiter(this, void 0, void 0, function* () {
+                const { user, } = event.returnValues;
+                const { maintenanceMargin, borrowedAmount: originalBorrowedAmount, collateralAmount, lastInterestIndex } = yield this.contract.methods.account_to_position(user).call();
+                const collateralValue = utils_1.humanizeTokenAmount(yield this.swapExchange.methods.getInputToOutputAmount(this.collateralTokenAddress, collateralAmount).call(), this.collateralTokenDecimals);
+                console.log("collateral value", collateralValue);
+                console.log("borrowed value", utils_1.humanizeTokenAmount(originalBorrowedAmount, this.assetTokenDecimals));
+                const collateralisationRatio = utils_1.humanizeTokenAmount(originalBorrowedAmount, this.assetTokenDecimals) / collateralValue;
+                console.log("ratio", collateralisationRatio);
+                console.log("contract", this.contract.options.address);
+                const position = {
+                    user,
+                    maintenanceMargin,
+                    originalBorrowedAmount,
+                    collateralAmount,
+                    lastInterestIndex,
+                    collateralisationRatio,
+                };
+                yield this.updatePosition(position);
+            });
+            const increaseEmitter = this.contract.events.IncreasePosition()
+                .on("data", handlePositionChange)
+                .on("change", handlePositionChange);
+            this.eventEmitters = this.eventEmitters.concat([increaseEmitter]);
+        });
+    }
+    updatePosition(position) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.positionsCollection.updateOne({ user: position.user }, { "$set": Object.assign({}, position) }, { upsert: true });
         });
     }
 }

@@ -5,6 +5,7 @@ export const MARGIN_MARKETS_COLL_NAME: string = "swap.margin.markets";
 export class MarginMarketCollections {
     public marginMarketsCollection: any;
     public fundingHistoryCollections: { [marginMarketAddress: string]: any } = {};
+    public positionCollections: { [marginMarketAddress: string]: any } = {};
 
     async init() {
         console.log(`\nFetching Margin Market collections`);
@@ -72,45 +73,34 @@ export class MarginMarketCollections {
         this.fundingHistoryCollections[marginMarketAddress] = await DATABASE.db.collection(FUNDING_COLL_NAME);
     }
 
-    // async addCandleCollection(baseTokenAddress: string, assetTokenAddress: string) {
-    //     await Promise.all(
-    //         SwapCollections.candleTimeframes.map(async ({ timeframe, stalePeriod }) => {
-    //             const CANDLES_COLL_NAME = `swap.candles.${timeframe}.${baseTokenAddress}.${assetTokenAddress}`;
-    
-    //             let candlesCollExists = (await DATABASE.db.listCollections({ name: CANDLES_COLL_NAME }).toArray()).first();
-    //             if (!candlesCollExists) {
-    //                 console.log(`   ⛏️  Creating ${CANDLES_COLL_NAME} collection`);
-    //                 await DATABASE.db.createCollection(CANDLES_COLL_NAME, {
-    //                     "validator": {
-    //                         "$jsonSchema": { 
-    //                             "bsonType": "object",
-    //                             "required": ["high", "low", "open", "close", "volume", "openTimestamp"],
-    //                             "properties": {
-    //                                 "high": { "bsonType": ["int", "double"] },
-    //                                 "low": { "bsonType": ["int", "double"] },
-    //                                 "open": { "bsonType": ["int", "double"] },
-    //                                 "close": { "bsonType": ["int", "double"] },
-    //                                 "volume": { "bsonType": ["int", "double"] },
-    //                                 "openTimestamp": { "bsonType": "double" },
-    //                             }
-    //                         }
-    //                     }
-    //                 });
+    async addPositionsCollection(marginMarketAddress: string) {
+        const POSITIONS_COLL_NAME = `swap.margin.positions.${marginMarketAddress}`;
+        let positionsCollExists = (await DATABASE.db.listCollections({ name: POSITIONS_COLL_NAME }).toArray())[0];
+        if (!positionsCollExists) {
+            console.log(`   ⛏️  Creating ${POSITIONS_COLL_NAME} collection`);
+            await DATABASE.db.createCollection(POSITIONS_COLL_NAME, {
+                "validator": {
+                    "$jsonSchema": { 
+                        "bsonType": "object",
+                        "required": ["user", "collateralisationRatio", "originalBorrowedAmount", "collateralAmount", "maintenanceMargin", "lastInterestIndex"],
+                        "properties": {
+                            "user": { "bsonType": "string" },
+                            "collateralisationRatio": { "bsonType": "double" },
+                            "originalBorrowedAmount": { "bsonType": "string" },
+                            "collateralAmount": { "bsonType": "string" },
+                            "maintenanceMargin": { "bsonType": "string" },
+                            "lastInterestIndex": { "bsonType": "string" },
+                        }
+                    }
+                }
+            });
 
-    //                 // Remove any stale candles using a TTL index
-    //                 // stalePeriod can be undefined, in which case candles will never expire
-    //                 DATABASE.db.collection(CANDLES_COLL_NAME).createIndex(
-    //                     { "openTimestamp": 1 },
-    //                     removeEmptyFields({ expireAfterSeconds: stalePeriod })
-    //                 );
-    //             }
-    
-    //             if (!this.candleCollections[baseTokenAddress]) this.candleCollections[baseTokenAddress] = {};
-    //             if (!this.candleCollections[baseTokenAddress][assetTokenAddress]) this.candleCollections[baseTokenAddress][assetTokenAddress] = {};
-    //             this.candleCollections[baseTokenAddress][assetTokenAddress][timeframe] = await DATABASE.db.collection(CANDLES_COLL_NAME);
-    //         })
-    //     );
-    // }
+            DATABASE.db.collection(POSITIONS_COLL_NAME).createIndex({ "user": 1, },);
+            DATABASE.db.collection(POSITIONS_COLL_NAME).createIndex({ "collateralisationRatio": 1, },);
+        }
+
+        this.positionCollections[marginMarketAddress] = await DATABASE.db.collection(POSITIONS_COLL_NAME);
+    }
 }
 
 export const MARGIN_MARKET_COLLECTIONS = new MarginMarketCollections();

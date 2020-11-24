@@ -3,7 +3,8 @@ import { FACTORY } from "./factory";
 import { newContract } from "../Global/web3";
 import { EventEmitter } from "events";
 import Web3 from "web3";
-// import { humanizeTokenAmount } from "../Global/utils";
+import { humanizeTokenAmount } from "../Global/utils";
+import { SWAP_COLLECTIONS } from "../Swap/collections";
 
 //@ts-ignore
 const BN = Web3.utils.BN;
@@ -62,6 +63,15 @@ type DepositWithdraw = {
     timestamp: number
 }
 
+type Position = {
+    user: string,
+    maintenanceMargin: string,
+    originalBorrowedAmount: string,
+    collateralAmount: string,
+    lastInterestIndex: string,
+    collateralisationRatio: number,
+}
+
 class MarginMarket {
     public contract: any;
     public collateralTokenAddress!: string;
@@ -69,7 +79,9 @@ class MarginMarket {
     public assetTokenDecimals!: number;
     public collateralTokenDecimals!: number;
     private eventEmitters: EventEmitter[] = [];
-    private  fundingHistoryCollection!: any;
+    private fundingHistoryCollection!: any;
+    private positionsCollection!: any;
+    private swapExchange!: any;
 
     constructor(contractAddress: string) {
         this.contract = newContract("MarginMarket", contractAddress);
@@ -88,13 +100,23 @@ class MarginMarket {
         this.collateralTokenDecimals = collateralTokenDecimals;
         this.assetTokenDecimals = assetTokenDecimals;
 
-        // console.log(this);
+        const { exchangeAddress: swapExchangeAddress } = await SWAP_COLLECTIONS.exchangesCollection.findOne({ 
+            $or: [
+                { assetTokenAddress, baseTokenAddress: collateralTokenAddress },
+                { assetTokenAddress: collateralTokenAddress, baseTokenAddress: assetTokenAddress },
+            ] 
+        });
+
+        this.swapExchange = newContract("SwapExchange", swapExchangeAddress);
 
         await MARGIN_MARKET_COLLECTIONS.addFundingHistoryCollection(this.contract.options.address);
         this.fundingHistoryCollection = MARGIN_MARKET_COLLECTIONS.fundingHistoryCollections[this.contract.options.address];
-        // await SWAP_COLLECTIONS.addCandleCollection(this.baseTokenAddress, this.assetTokenAddress);
-        // await SWAP_COLLECTIONS.addCandleCollection(this.assetTokenAddress, this.baseTokenAddress);
+        
+        await MARGIN_MARKET_COLLECTIONS.addPositionsCollection(this.contract.options.address);
+        this.positionsCollection = MARGIN_MARKET_COLLECTIONS.positionCollections[this.contract.options.address];
+
         await this.startFundingListener();
+        await this.startPositionsListener();
     }
 
     async stop() {
@@ -165,89 +187,54 @@ class MarginMarket {
         await this.fundingHistoryCollection.deleteOne({ user, txId });
     }
 
-    // async addTradeToCandles(trade: Trade) {
-    //     Promise.all(
-    //         SwapCollections.candleTimeframes.map(async ({ timeframe }) => {
-    //             // Insert candles for base/asset and asset/base
-    //             const assetTokenAmount = humanizeTokenAmount(trade.assetTokenAmount, this.assetTokenDecimals);
-    //             const baseTokenAmount = humanizeTokenAmount(trade.baseTokenAmount, this.collateralTokenDecimals);
+    async startPositionsListener() {
+        const handlePositionChange = async (event: any) => {
+            const { user, } = event.returnValues; 
 
-    //             Promise.all([
-    //                 {
-    //                     candleCollection: SWAP_COLLECTIONS.candleCollections[this.baseTokenAddress][this.assetTokenAddress][timeframe],
-    //                     assetPrice: baseTokenAmount / assetTokenAmount,
-    //                     volume: baseTokenAmount,
-    //                 },
-    //                 {
-    //                     candleCollection: SWAP_COLLECTIONS.candleCollections[this.assetTokenAddress][this.baseTokenAddress][timeframe],
-    //                     assetPrice: assetTokenAmount / baseTokenAmount,
-    //                     volume: assetTokenAmount,
-    //                 }
-    //             ].map(async ({ candleCollection, assetPrice, volume }) => {
-    //                 const openTimestamp = Math.floor(Date.now() / timeframe) * timeframe;
+            const {
+                maintenanceMargin, 
+                borrowedAmount: originalBorrowedAmount, 
+                collateralAmount, 
+                lastInterestIndex 
+            } = await this.contract.methods.account_to_position(user).call();
 
-    //                 // Get the current candle in this openTimestamp or create a new candle.
-    //                 const lastCandle: Candle | undefined = await candleCollection.findOne({ openTimestamp });
-    //                 const currentCandle: Candle = lastCandle ?? {
-    //                     high: 0,
-    //                     low: 0,
-    //                     open: assetPrice,
-    //                     close: 0,
-    //                     volume: 0,
-    //                     openTimestamp,
-    //                 };
-    
-    //                 currentCandle.high = Math.max(currentCandle.high, assetPrice);
-    //                 currentCandle.low = currentCandle.low === 0 ? assetPrice : Math.min(currentCandle.low, assetPrice);
-    //                 currentCandle.close = assetPrice;
-    //                 currentCandle.volume += volume;
+            const collateralValue = humanizeTokenAmount(
+                await this.swapExchange.methods.getInputToOutputAmount(this.collateralTokenAddress, collateralAmount).call(), 
+                this.collateralTokenDecimals
+            );
+            console.log("collateral value", collateralValue)
+            console.log("borrowed value", humanizeTokenAmount(originalBorrowedAmount, this.assetTokenDecimals))
+            const collateralisationRatio = humanizeTokenAmount(originalBorrowedAmount, this.assetTokenDecimals) / collateralValue;
+            console.log("ratio", collateralisationRatio);
 
-    //                 if (timeframe === TIMEFRAMES["1m"]) {
-    //                     console.log(trade);
-    //                     console.log("last Candle", lastCandle);
-    //                     console.log("current candle", currentCandle);
-    //                 }
-    
-    //                 await candleCollection.updateOne({ openTimestamp }, { "$set": currentCandle }, { upsert: true });
-    //             }))
-    //         })
-    //     );
-    // }
+            console.log("contract", this.contract.options.address);
 
-    // async removeTradeFromCandles({ user, txId }: Trade) {
-    //     const trade = await this.tradeHistoryCollection.findOne({ user, txId });
+            const position: Position = {
+                user,  
+                maintenanceMargin,
+                originalBorrowedAmount,
+                collateralAmount,
+                lastInterestIndex,
+                collateralisationRatio,
+            };
 
-    //     await Promise.all(
-    //         SwapCollections.candleTimeframes.map(async ({ timeframe }) => {
-    //             const assetTokenAmount = humanizeTokenAmount(trade.assetTokenAmount, this.assetTokenDecimals);
-    //             const baseTokenAmount = humanizeTokenAmount(trade.baseTokenAmount, this.collateralTokenDecimals);
+            await this.updatePosition(position);
+        }
 
-    //             Promise.all(
-    //                 [
-    //                     {
-    //                         candleCollection: SWAP_COLLECTIONS.candleCollections[this.baseTokenAddress][this.assetTokenAddress][timeframe],
-    //                         volume: baseTokenAmount,
-    //                     },
-    //                     {
-    //                         candleCollection: SWAP_COLLECTIONS.candleCollections[this.assetTokenAddress][this.baseTokenAddress][timeframe],
-    //                         volume: assetTokenAmount,
-    //                     }
-    //                 ].map(async ({ candleCollection, volume }) => {
-    //                     const openTimestamp = Math.floor(trade.timestamp / timeframe) * timeframe;
-    //                     const candle: Candle = await candleCollection.findOne({ openTimestamp });
-                        
-    //                     // Simple update - just deduct the volume from the existing candle
-    //                     // Possible TODO: Add in more fine-grained removal - Track the highest, lowest and close prices to see if they
-    //                     // need updating too.
-    //                     if (candle) {
-    //                         candle.volume -= volume;
-    //                         candleCollection.updateOne({ openTimestamp }, candle);
-    //                     }
-    //                 })
-    //             )
-    //         })
-    //     );
-    // }
+        const increaseEmitter = this.contract.events.IncreasePosition()
+            .on("data", handlePositionChange)
+            .on("change", handlePositionChange);
+
+        this.eventEmitters = this.eventEmitters.concat([increaseEmitter]);
+    }
+
+    async updatePosition(position: Position) {
+        await this.positionsCollection.updateOne(
+            { user: position.user },
+            { "$set": { ...position }},
+            { upsert: true },
+        );
+    }
 }
 
 export const ALL_MARGIN_MARKETS = new AllMarginMarkets();

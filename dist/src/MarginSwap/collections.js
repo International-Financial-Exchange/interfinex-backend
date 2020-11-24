@@ -15,42 +15,7 @@ exports.MARGIN_MARKETS_COLL_NAME = "swap.margin.markets";
 class MarginMarketCollections {
     constructor() {
         this.fundingHistoryCollections = {};
-        // async addCandleCollection(baseTokenAddress: string, assetTokenAddress: string) {
-        //     await Promise.all(
-        //         SwapCollections.candleTimeframes.map(async ({ timeframe, stalePeriod }) => {
-        //             const CANDLES_COLL_NAME = `swap.candles.${timeframe}.${baseTokenAddress}.${assetTokenAddress}`;
-        //             let candlesCollExists = (await DATABASE.db.listCollections({ name: CANDLES_COLL_NAME }).toArray()).first();
-        //             if (!candlesCollExists) {
-        //                 console.log(`   ⛏️  Creating ${CANDLES_COLL_NAME} collection`);
-        //                 await DATABASE.db.createCollection(CANDLES_COLL_NAME, {
-        //                     "validator": {
-        //                         "$jsonSchema": { 
-        //                             "bsonType": "object",
-        //                             "required": ["high", "low", "open", "close", "volume", "openTimestamp"],
-        //                             "properties": {
-        //                                 "high": { "bsonType": ["int", "double"] },
-        //                                 "low": { "bsonType": ["int", "double"] },
-        //                                 "open": { "bsonType": ["int", "double"] },
-        //                                 "close": { "bsonType": ["int", "double"] },
-        //                                 "volume": { "bsonType": ["int", "double"] },
-        //                                 "openTimestamp": { "bsonType": "double" },
-        //                             }
-        //                         }
-        //                     }
-        //                 });
-        //                 // Remove any stale candles using a TTL index
-        //                 // stalePeriod can be undefined, in which case candles will never expire
-        //                 DATABASE.db.collection(CANDLES_COLL_NAME).createIndex(
-        //                     { "openTimestamp": 1 },
-        //                     removeEmptyFields({ expireAfterSeconds: stalePeriod })
-        //                 );
-        //             }
-        //             if (!this.candleCollections[baseTokenAddress]) this.candleCollections[baseTokenAddress] = {};
-        //             if (!this.candleCollections[baseTokenAddress][assetTokenAddress]) this.candleCollections[baseTokenAddress][assetTokenAddress] = {};
-        //             this.candleCollections[baseTokenAddress][assetTokenAddress][timeframe] = await DATABASE.db.collection(CANDLES_COLL_NAME);
-        //         })
-        //     );
-        // }
+        this.positionCollections = {};
     }
     init() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -110,6 +75,34 @@ class MarginMarketCollections {
                 database_1.DATABASE.db.collection(FUNDING_COLL_NAME).createIndex({ "user": 1, "txId": 1 });
             }
             this.fundingHistoryCollections[marginMarketAddress] = yield database_1.DATABASE.db.collection(FUNDING_COLL_NAME);
+        });
+    }
+    addPositionsCollection(marginMarketAddress) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const POSITIONS_COLL_NAME = `swap.margin.positions.${marginMarketAddress}`;
+            let positionsCollExists = (yield database_1.DATABASE.db.listCollections({ name: POSITIONS_COLL_NAME }).toArray())[0];
+            if (!positionsCollExists) {
+                console.log(`   ⛏️  Creating ${POSITIONS_COLL_NAME} collection`);
+                yield database_1.DATABASE.db.createCollection(POSITIONS_COLL_NAME, {
+                    "validator": {
+                        "$jsonSchema": {
+                            "bsonType": "object",
+                            "required": ["user", "collateralisationRatio", "originalBorrowedAmount", "collateralAmount", "maintenanceMargin", "lastInterestIndex"],
+                            "properties": {
+                                "user": { "bsonType": "string" },
+                                "collateralisationRatio": { "bsonType": "double" },
+                                "originalBorrowedAmount": { "bsonType": "string" },
+                                "collateralAmount": { "bsonType": "string" },
+                                "maintenanceMargin": { "bsonType": "string" },
+                                "lastInterestIndex": { "bsonType": "string" },
+                            }
+                        }
+                    }
+                });
+                database_1.DATABASE.db.collection(POSITIONS_COLL_NAME).createIndex({ "user": 1, });
+                database_1.DATABASE.db.collection(POSITIONS_COLL_NAME).createIndex({ "collateralisationRatio": 1, });
+            }
+            this.positionCollections[marginMarketAddress] = yield database_1.DATABASE.db.collection(POSITIONS_COLL_NAME);
         });
     }
 }

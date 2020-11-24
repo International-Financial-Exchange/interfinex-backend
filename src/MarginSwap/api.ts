@@ -9,7 +9,7 @@ class MarginMarketApi {
 
     async start() {
         this.getFundingHistory();
-        // this.getCandles();
+        this.getPositions();
     }
 
     async getFundingHistory() {
@@ -41,36 +41,30 @@ class MarginMarketApi {
         });
     }
 
-    // async getCandles() {
-    //     type CandleQuery = {
-    //         baseTokenAddress: string,
-    //         assetTokenAddress: string,
-    //         timeframe: number,
-    //         from?: number,
-    //         to: number,
-    //         limit: number,
-    //     };
+    async getPositions() {
+        type PositionsQuery = {
+            marginMarketContract: string,
+            user?: string,
+            limit: number,
+        };
 
-    //     GLOBAL_API.app.get(`${MarginMarketApi.URL_PREFIX}candles`, async (req, res) => {
-    //         const query: CandleQuery = {
-    //             baseTokenAddress: isString(req.query.baseTokenAddress) ? req.query.baseTokenAddress : "",
-    //             assetTokenAddress: isString(req.query.assetTokenAddress) ? req.query.assetTokenAddress : "",
-    //             timeframe: (isString(req.query.timeframe) ? parseFloat(req.query.timeframe) : TIMEFRAMES["15m"]) ?? TIMEFRAMES["15m"],
-    //             from: isString(req.query.from) ? parseFloat(req.query.from) : undefined,
-    //             to: isString(req.query.to) ? parseFloat(req.query.to) : Date.now(),
-    //             limit: isString(req.query.limit) ? parseFloat(req.query.limit) : 150,
-    //         };
+        GLOBAL_API.app.get(`${MarginMarketApi.URL_PREFIX}positions`, async (req, res) => {
+            const query: PositionsQuery = {
+                marginMarketContract: isString(req.query.marginMarketContract) ? req.query.marginMarketContract : "",
+                user: isString(req.query.user) ? req.query.user : undefined,
+                limit: isString(req.query.limit) ? parseFloat(req.query.limit) : 150,
+            };
 
-    //         const candleCollection = SWAP_COLLECTIONS.candleCollections[query.baseTokenAddress][query.assetTokenAddress][query.timeframe];
-    //         const candles = await candleCollection
-    //             .find(removeEmptyFields({ openTimestamp: { $gt: query.from, $lte: query.to }}))
-    //             .sort({ openTimestamp: 1 })
-    //             .limit(Math.min(query.limit, 500)) // Max of 500
-    //             .toArray();
+            const positionsCollection = MARGIN_MARKET_COLLECTIONS.positionCollections[query.marginMarketContract];
+            const positions = await positionsCollection
+                .find(removeEmptyFields({ user: query.user }))
+                .sort({ collateralisationRatio: -1 })
+                .limit(Math.min(query.limit, 500)) // Max of 500
+                .toArray();
 
-    //         res.json(candles);
-    //     });
-    // }
+            res.json(positions);
+        });
+    }
 }
 
 export const MARGIN_MARKET_API = new MarginMarketApi();

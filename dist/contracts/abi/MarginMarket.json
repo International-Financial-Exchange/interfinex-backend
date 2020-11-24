@@ -34,6 +34,87 @@
         "type": "event"
     },
     {
+        "name": "IncreasePosition",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "user",
+                "indexed": true
+            },
+            {
+                "type": "uint256",
+                "name": "borrowedAmount",
+                "indexed": false
+            },
+            {
+                "type": "uint256",
+                "name": "collateralToken",
+                "indexed": false
+            },
+            {
+                "type": "uint256",
+                "name": "maintenanceMargin",
+                "indexed": false
+            }
+        ],
+        "anonymous": false,
+        "type": "event"
+    },
+    {
+        "name": "DecreasePosition",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "user",
+                "indexed": true
+            },
+            {
+                "type": "uint256",
+                "name": "borrowedAmount",
+                "indexed": false
+            },
+            {
+                "type": "uint256",
+                "name": "collateralToken",
+                "indexed": false
+            },
+            {
+                "type": "uint256",
+                "name": "maintenanceMargin",
+                "indexed": false
+            }
+        ],
+        "anonymous": false,
+        "type": "event"
+    },
+    {
+        "name": "LiquidatePosition",
+        "inputs": [
+            {
+                "type": "address",
+                "name": "user",
+                "indexed": true
+            },
+            {
+                "type": "uint256",
+                "name": "borrowedAmount",
+                "indexed": false
+            },
+            {
+                "type": "uint256",
+                "name": "collateralToken",
+                "indexed": false
+            },
+            {
+                "type": "uint256",
+                "name": "maintenanceMargin",
+                "indexed": false
+            }
+        ],
+        "anonymous": false,
+        "type": "event"
+    },
+    {
         "name": "initialize",
         "outputs": [],
         "inputs": [
@@ -189,7 +270,7 @@
         ],
         "stateMutability": "nonpayable",
         "type": "function",
-        "gas": 514367
+        "gas": 517267
     },
     {
         "name": "decreasePosition",
@@ -218,7 +299,7 @@
         ],
         "stateMutability": "nonpayable",
         "type": "function",
-        "gas": 710515
+        "gas": 713497
     },
     {
         "name": "closePosition",
@@ -243,7 +324,7 @@
         ],
         "stateMutability": "nonpayable",
         "type": "function",
-        "gas": 714336
+        "gas": 717318
     },
     {
         "name": "liquidatePosition",
@@ -256,7 +337,7 @@
         ],
         "stateMutability": "nonpayable",
         "type": "function",
-        "gas": 454556
+        "gas": 457460
     },
     {
         "name": "depositVote",

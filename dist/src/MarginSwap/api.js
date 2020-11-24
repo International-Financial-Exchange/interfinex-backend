@@ -19,7 +19,7 @@ class MarginMarketApi {
     start() {
         return __awaiter(this, void 0, void 0, function* () {
             this.getFundingHistory();
-            // this.getCandles();
+            this.getPositions();
         });
     }
     getFundingHistory() {
@@ -39,6 +39,24 @@ class MarginMarketApi {
                     .limit(Math.min(query.limit, 500)) // Max of 500
                     .toArray();
                 res.json(fundingEvents);
+            }));
+        });
+    }
+    getPositions() {
+        return __awaiter(this, void 0, void 0, function* () {
+            api_1.GLOBAL_API.app.get(`${MarginMarketApi.URL_PREFIX}positions`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const query = {
+                    marginMarketContract: lodash_1.isString(req.query.marginMarketContract) ? req.query.marginMarketContract : "",
+                    user: lodash_1.isString(req.query.user) ? req.query.user : undefined,
+                    limit: lodash_1.isString(req.query.limit) ? parseFloat(req.query.limit) : 150,
+                };
+                const positionsCollection = collections_1.MARGIN_MARKET_COLLECTIONS.positionCollections[query.marginMarketContract];
+                const positions = yield positionsCollection
+                    .find(utils_1.removeEmptyFields({ user: query.user }))
+                    .sort({ collateralisationRatio: -1 })
+                    .limit(Math.min(query.limit, 500)) // Max of 500
+                    .toArray();
+                res.json(positions);
             }));
         });
     }
