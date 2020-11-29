@@ -23,6 +23,7 @@ import MarginFactoryAbi from "../contracts/abi/MarginFactory.json";
 import MarginMarketAbi from "../contracts/abi/MarginMarket.json";
 import SwapExchangeAbi from "../contracts/abi/SwapExchange.json";
 import SwapFactoryAbi from "../contracts/abi/SwapFactory.json";
+import YieldFarmAbi from "../contracts/abi/YieldFarm.json";
 export const ABI = {
     DividendERC20: DividendERC20Abi,
     ERC20: ERC20Abi,
@@ -30,6 +31,7 @@ export const ABI = {
     MarginMarket: MarginMarketAbi,
     SwapExchange: SwapExchangeAbi,
     SwapFactory: SwapFactoryAbi,
+    YieldFarm: YieldFarmAbi,
 };
 
 //@ts-ignore

@@ -45,6 +45,7 @@ class MarginMarketApi {
         type PositionsQuery = {
             marginMarketContract: string,
             user?: string,
+            offset: number,
             limit: number,
         };
 
@@ -53,12 +54,15 @@ class MarginMarketApi {
                 marginMarketContract: isString(req.query.marginMarketContract) ? req.query.marginMarketContract : "",
                 user: isString(req.query.user) ? req.query.user : undefined,
                 limit: isString(req.query.limit) ? parseFloat(req.query.limit) : 150,
+                offset: isString(req.query.offset) ? parseFloat(req.query.offset) : 0,
             };
 
             const positionsCollection = MARGIN_MARKET_COLLECTIONS.positionCollections[query.marginMarketContract];
+            console.log(query)
             const positions = await positionsCollection
                 .find(removeEmptyFields({ user: query.user }))
                 .sort({ collateralisationRatio: -1 })
+                .skip(query.offset)
                 .limit(Math.min(query.limit, 500)) // Max of 500
                 .toArray();
 

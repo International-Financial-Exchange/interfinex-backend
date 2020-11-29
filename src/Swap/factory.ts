@@ -21,6 +21,7 @@ class Factory {
         const exchange_count = parseFloat(await this.factoryContract.methods.exchange_count().call());
         const createdExchanges = (await Promise.all(
             Array.from(Array(exchange_count).keys())
+                .map((_, i) => i + 1)
                 .map(async exchange_id => {
                     const exchangeAddress = await this.factoryContract.methods.id_to_exchange(exchange_id).call();
                     if (!(await SWAP_COLLECTIONS.exchangesCollection.findOne({ exchangeAddress }))) {

@@ -85,10 +85,10 @@ export class MarginMarketCollections {
                         "required": ["user", "collateralisationRatio", "originalBorrowedAmount", "collateralAmount", "maintenanceMargin", "lastInterestIndex"],
                         "properties": {
                             "user": { "bsonType": "string" },
-                            "collateralisationRatio": { "bsonType": "double" },
-                            "originalBorrowedAmount": { "bsonType": "string" },
-                            "collateralAmount": { "bsonType": "string" },
-                            "maintenanceMargin": { "bsonType": "string" },
+                            "collateralisationRatio": { "bsonType": ["double", "int"] },
+                            "originalBorrowedAmount": { "bsonType": ["double", "int"] },
+                            "collateralAmount": { "bsonType": ["double", "int"] },
+                            "maintenanceMargin": { "bsonType": ["double", "int"] },
                             "lastInterestIndex": { "bsonType": "string" },
                         }
                     }

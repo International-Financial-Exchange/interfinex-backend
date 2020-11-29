@@ -32,6 +32,7 @@ class Factory {
             console.log(`   ⛏️  Initialising ${collections_1.EXCHANGES_COLL_NAME} collection`);
             const exchange_count = parseFloat(yield this.factoryContract.methods.exchange_count().call());
             const createdExchanges = (yield Promise.all(Array.from(Array(exchange_count).keys())
+                .map((_, i) => i + 1)
                 .map((exchange_id) => __awaiter(this, void 0, void 0, function* () {
                 const exchangeAddress = yield this.factoryContract.methods.id_to_exchange(exchange_id).call();
                 if (!(yield collections_1.SWAP_COLLECTIONS.exchangesCollection.findOne({ exchangeAddress }))) {

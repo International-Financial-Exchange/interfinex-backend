@@ -141,7 +141,7 @@
         ],
         "stateMutability": "nonpayable",
         "type": "function",
-        "gas": 535010
+        "gas": 604961
     },
     {
         "name": "pureAccrueInterest",
@@ -184,7 +184,7 @@
         ],
         "stateMutability": "nonpayable",
         "type": "function",
-        "gas": 327922
+        "gas": 327990
     },
     {
         "name": "withdraw",
@@ -202,7 +202,7 @@
         ],
         "stateMutability": "nonpayable",
         "type": "function",
-        "gas": 327101
+        "gas": 327169
     },
     {
         "name": "getPosition",
@@ -233,6 +233,32 @@
         "stateMutability": "view",
         "type": "function",
         "gas": 22506
+    },
+    {
+        "name": "authorize",
+        "outputs": [],
+        "inputs": [
+            {
+                "type": "address",
+                "name": "spender"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function",
+        "gas": 36028
+    },
+    {
+        "name": "deauthorize",
+        "outputs": [],
+        "inputs": [
+            {
+                "type": "address",
+                "name": "spender"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function",
+        "gas": 21058
     },
     {
         "name": "increasePosition",
@@ -266,11 +292,15 @@
             {
                 "type": "bool",
                 "name": "useIfex"
+            },
+            {
+                "type": "address",
+                "name": "account"
             }
         ],
         "stateMutability": "nonpayable",
         "type": "function",
-        "gas": 517267
+        "gas": 614023
     },
     {
         "name": "decreasePosition",
@@ -295,11 +325,15 @@
             {
                 "type": "bool",
                 "name": "useIfex"
+            },
+            {
+                "type": "address",
+                "name": "account"
             }
         ],
         "stateMutability": "nonpayable",
         "type": "function",
-        "gas": 713497
+        "gas": 715103
     },
     {
         "name": "closePosition",
@@ -320,11 +354,15 @@
             {
                 "type": "bool",
                 "name": "useIfex"
+            },
+            {
+                "type": "address",
+                "name": "account"
             }
         ],
         "stateMutability": "nonpayable",
         "type": "function",
-        "gas": 717318
+        "gas": 718929
     },
     {
         "name": "liquidatePosition",
@@ -337,7 +375,7 @@
         ],
         "stateMutability": "nonpayable",
         "type": "function",
-        "gas": 457460
+        "gas": 554909
     },
     {
         "name": "depositVote",
@@ -358,7 +396,7 @@
         ],
         "stateMutability": "nonpayable",
         "type": "function",
-        "gas": 318992
+        "gas": 318552
     },
     {
         "name": "withdrawVote",
@@ -367,15 +405,11 @@
             {
                 "type": "uint256",
                 "name": "proposalId"
-            },
-            {
-                "type": "uint256",
-                "name": "voteOption"
             }
         ],
         "stateMutability": "nonpayable",
         "type": "function",
-        "gas": 135822
+        "gas": 135567
     },
     {
         "name": "getWinningOption",
@@ -397,7 +431,7 @@
         ],
         "stateMutability": "view",
         "type": "function",
-        "gas": 7386
+        "gas": 7506
     },
     {
         "name": "finalizeVote",
@@ -410,7 +444,7 @@
         ],
         "stateMutability": "nonpayable",
         "type": "function",
-        "gas": 461390
+        "gas": 516178
     },
     {
         "name": "collateralToken",
@@ -423,7 +457,7 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 1871
+        "gas": 1931
     },
     {
         "name": "assetToken",
@@ -436,7 +470,7 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 1901
+        "gas": 1961
     },
     {
         "name": "ifexToken",
@@ -449,7 +483,7 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 1931
+        "gas": 1991
     },
     {
         "name": "liquidityToken",
@@ -462,7 +496,7 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 1961
+        "gas": 2021
     },
     {
         "name": "swapExchange",
@@ -475,7 +509,7 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 1991
+        "gas": 2051
     },
     {
         "name": "swapFactory",
@@ -488,7 +522,7 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2021
+        "gas": 2081
     },
     {
         "name": "assetIfexSwapExchange",
@@ -501,7 +535,29 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2051
+        "gas": 2111
+    },
+    {
+        "name": "isAuthorized",
+        "outputs": [
+            {
+                "type": "bool",
+                "name": ""
+            }
+        ],
+        "inputs": [
+            {
+                "type": "address",
+                "name": "arg0"
+            },
+            {
+                "type": "address",
+                "name": "arg1"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "gas": 2571
     },
     {
         "name": "interestIndex",
@@ -514,7 +570,7 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2081
+        "gas": 2171
     },
     {
         "name": "totalBorrowed",
@@ -527,7 +583,7 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2111
+        "gas": 2201
     },
     {
         "name": "totalReserved",
@@ -540,7 +596,7 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2141
+        "gas": 2231
     },
     {
         "name": "interestRate",
@@ -553,7 +609,7 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2171
+        "gas": 2261
     },
     {
         "name": "lastUpdate",
@@ -566,7 +622,7 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2201
+        "gas": 2291
     },
     {
         "name": "interestMultiplier",
@@ -579,7 +635,7 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2231
+        "gas": 2321
     },
     {
         "name": "minInitialMarginRate",
@@ -592,7 +648,7 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2261
+        "gas": 2351
     },
     {
         "name": "maintenanceMarginRate",
@@ -605,10 +661,10 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2291
+        "gas": 2381
     },
     {
-        "name": "maxBorrowAmount",
+        "name": "maxBorrowAmountRate",
         "outputs": [
             {
                 "type": "uint256",
@@ -618,7 +674,85 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2321
+        "gas": 2411
+    },
+    {
+        "name": "maxLiquidateVolumeRate",
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": ""
+            }
+        ],
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "gas": 2441
+    },
+    {
+        "name": "currentBlockLiquidations",
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": ""
+            }
+        ],
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "gas": 2471
+    },
+    {
+        "name": "lastLiquidateBlock",
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": ""
+            }
+        ],
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "gas": 2501
+    },
+    {
+        "name": "currentBlockBorrows",
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": ""
+            }
+        ],
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "gas": 2531
+    },
+    {
+        "name": "lastBorrowBlock",
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": ""
+            }
+        ],
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "gas": 2561
+    },
+    {
+        "name": "votingDuration",
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": ""
+            }
+        ],
+        "inputs": [],
+        "stateMutability": "view",
+        "type": "function",
+        "gas": 2591
     },
     {
         "name": "isInitialized",
@@ -631,7 +765,7 @@
         "inputs": [],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2351
+        "gas": 2621
     },
     {
         "name": "account_to_position",
@@ -661,7 +795,7 @@
         ],
         "stateMutability": "view",
         "type": "function",
-        "gas": 5794
+        "gas": 6064
     },
     {
         "name": "proposalVotes",
@@ -683,7 +817,7 @@
         ],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2641
+        "gas": 2911
     },
     {
         "name": "proposalVoteOptions",
@@ -701,7 +835,25 @@
         ],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2556
+        "gas": 2826
+    },
+    {
+        "name": "proposalBaselineVote",
+        "outputs": [
+            {
+                "type": "uint256",
+                "name": ""
+            }
+        ],
+        "inputs": [
+            {
+                "type": "uint256",
+                "name": "arg0"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "gas": 2856
     },
     {
         "name": "proposalFinalisationDate",
@@ -719,7 +871,7 @@
         ],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2586
+        "gas": 2886
     },
     {
         "name": "userVotes",
@@ -737,15 +889,11 @@
             {
                 "type": "uint256",
                 "name": "arg1"
-            },
-            {
-                "type": "uint256",
-                "name": "arg2"
             }
         ],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2946
+        "gas": 3131
     },
     {
         "name": "userLastVote",
@@ -767,7 +915,7 @@
         ],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2861
+        "gas": 3161
     },
     {
         "name": "userDeposits",
@@ -785,6 +933,6 @@
         ],
         "stateMutability": "view",
         "type": "function",
-        "gas": 2776
+        "gas": 3076
     }
 ]

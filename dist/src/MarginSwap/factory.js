@@ -32,7 +32,7 @@ class Factory {
             console.log(`   ⛏️  Initialising ${collections_1.MARGIN_MARKETS_COLL_NAME} collection`);
             const marginMarketCount = parseFloat(yield this.factoryContract.methods.id_count().call());
             const createdMarginMarkets = (yield Promise.all(Array.from(Array(marginMarketCount).keys())
-                .slice(1)
+                .map((_, i) => i + 1)
                 .map((market_id) => __awaiter(this, void 0, void 0, function* () {
                 const marginMarketAddress = yield this.factoryContract.methods.id_to_margin_market(market_id).call();
                 if (!(yield collections_1.MARGIN_MARKET_COLLECTIONS.marginMarketsCollection.findOne({ marginMarketAddress }))) {

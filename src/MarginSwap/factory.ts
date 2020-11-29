@@ -21,7 +21,7 @@ class Factory {
         const marginMarketCount = parseFloat(await this.factoryContract.methods.id_count().call());
         const createdMarginMarkets = (await Promise.all(
             Array.from(Array(marginMarketCount).keys())
-                .slice(1)
+                .map((_, i) => i + 1)
                 .map(async market_id => {
                     const marginMarketAddress = await this.factoryContract.methods.id_to_margin_market(market_id).call();
                     if (!(await MARGIN_MARKET_COLLECTIONS.marginMarketsCollection.findOne({ marginMarketAddress }))) {

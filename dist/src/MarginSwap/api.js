@@ -49,11 +49,14 @@ class MarginMarketApi {
                     marginMarketContract: lodash_1.isString(req.query.marginMarketContract) ? req.query.marginMarketContract : "",
                     user: lodash_1.isString(req.query.user) ? req.query.user : undefined,
                     limit: lodash_1.isString(req.query.limit) ? parseFloat(req.query.limit) : 150,
+                    offset: lodash_1.isString(req.query.offset) ? parseFloat(req.query.offset) : 0,
                 };
                 const positionsCollection = collections_1.MARGIN_MARKET_COLLECTIONS.positionCollections[query.marginMarketContract];
+                console.log(query);
                 const positions = yield positionsCollection
                     .find(utils_1.removeEmptyFields({ user: query.user }))
                     .sort({ collateralisationRatio: -1 })
+                    .skip(query.offset)
                     .limit(Math.min(query.limit, 500)) // Max of 500
                     .toArray();
                 res.json(positions);

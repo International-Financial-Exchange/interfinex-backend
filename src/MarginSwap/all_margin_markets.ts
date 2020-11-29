@@ -65,9 +65,9 @@ type DepositWithdraw = {
 
 type Position = {
     user: string,
-    maintenanceMargin: string,
-    originalBorrowedAmount: string,
-    collateralAmount: string,
+    maintenanceMargin: number,
+    originalBorrowedAmount: number,
+    collateralAmount: number,
     lastInterestIndex: string,
     collateralisationRatio: number,
 }
@@ -202,21 +202,18 @@ class MarginMarket {
                 await this.swapExchange.methods.getInputToOutputAmount(this.collateralTokenAddress, collateralAmount).call(), 
                 this.collateralTokenDecimals
             );
-            console.log("collateral value", collateralValue)
-            console.log("borrowed value", humanizeTokenAmount(originalBorrowedAmount, this.assetTokenDecimals))
+            
             const collateralisationRatio = humanizeTokenAmount(originalBorrowedAmount, this.assetTokenDecimals) / collateralValue;
-            console.log("ratio", collateralisationRatio);
-
-            console.log("contract", this.contract.options.address);
-
             const position: Position = {
                 user,  
-                maintenanceMargin,
-                originalBorrowedAmount,
-                collateralAmount,
+                maintenanceMargin: humanizeTokenAmount(maintenanceMargin, this.assetTokenDecimals),
+                originalBorrowedAmount: humanizeTokenAmount(originalBorrowedAmount, this.assetTokenDecimals),
+                collateralAmount: humanizeTokenAmount(collateralAmount, this.collateralTokenDecimals),
                 lastInterestIndex,
-                collateralisationRatio,
+                collateralisationRatio: Number.isNaN(collateralisationRatio) ? 0 : collateralisationRatio,
             };
+
+            console.log("new position", position);
 
             await this.updatePosition(position);
         }
@@ -225,7 +222,15 @@ class MarginMarket {
             .on("data", handlePositionChange)
             .on("change", handlePositionChange);
 
-        this.eventEmitters = this.eventEmitters.concat([increaseEmitter]);
+        const decreaseEmitter = this.contract.events.DecreasePosition()
+            .on("data", handlePositionChange)
+            .on("change", handlePositionChange);
+
+        const liquidatorEmitter = this.contract.events.LiquidatePosition()
+            .on("data", handlePositionChange)
+            .on("change", handlePositionChange);
+
+        this.eventEmitters = this.eventEmitters.concat([increaseEmitter, decreaseEmitter, liquidatorEmitter]);
     }
 
     async updatePosition(position: Position) {

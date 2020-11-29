@@ -17,13 +17,17 @@ const api_2 = require("./Swap/api");
 require("./ENV");
 const MarginSwap_1 = require("./MarginSwap/MarginSwap");
 const api_3 = require("./MarginSwap/api");
+const yieldfarm_1 = require("./YieldFarm/yieldfarm");
+const api_4 = require("./YieldFarm/api");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield database_1.DATABASE.init();
     yield swap_1.SWAP.start();
     yield MarginSwap_1.MARGIN_SWAP.start();
+    yield yieldfarm_1.YIELD_FARM.start();
     yield api_1.GLOBAL_API.start();
     yield api_2.SWAP_API.start();
     yield api_3.MARGIN_MARKET_API.start();
+    yield api_4.YIELD_FARM_API.start();
 });
 main();
 //# sourceMappingURL=index.js.map
