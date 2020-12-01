@@ -61,6 +61,10 @@ class SwapApi {
                 limit: isString(req.query.limit) ? parseFloat(req.query.limit) : 150,
             };
 
+            console.log(query);
+            console.log(SWAP_COLLECTIONS.candleCollections)
+            console.log(SWAP_COLLECTIONS.candleCollections[query.baseTokenAddress]);
+
             const candleCollection = SWAP_COLLECTIONS.candleCollections[query.baseTokenAddress][query.assetTokenAddress][query.timeframe];
             const candles = await candleCollection
                 .find(removeEmptyFields({ openTimestamp: { $gt: query.from, $lte: query.to }}))

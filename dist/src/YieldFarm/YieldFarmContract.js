@@ -69,14 +69,16 @@ class YieldFarmContract {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`   ⛏️  Inserting new yield farm for: ${tokenContract}`);
             let token0Address, token1Address;
+            let marketContract;
             if (marketType === 0) {
                 const SwapFactory = web3_1.newContract("SwapFactory", ENV_1.CONTRACTS["SwapFactory"].address);
                 [token0Address, token1Address] = [
                     yield SwapFactory.methods.liquidity_token_to_pair(tokenContract, 0).call(),
                     yield SwapFactory.methods.liquidity_token_to_pair(tokenContract, 1).call(),
                 ];
+                marketContract = yield SwapFactory.methods.pair_to_exchange(token0Address, token1Address).call();
             }
-            return collections_1.YIELD_FARM_COLLECTIONS.farmsCollection.updateOne({ token0Address, token1Address, liquidityTokenContract: tokenContract, }, { "$set": { yieldPerBlock } }, { upsert: true });
+            return collections_1.YIELD_FARM_COLLECTIONS.farmsCollection.updateOne({ token0Address, token1Address, liquidityTokenContract: tokenContract, marketContract }, { "$set": { yieldPerBlock } }, { upsert: true });
         });
     }
 }

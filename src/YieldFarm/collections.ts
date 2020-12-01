@@ -23,9 +23,10 @@ export class YieldFarmCollections {
             "validator": {
                 "$jsonSchema": { 
                     "bsonType": "object",
-                    "required": ["liquidityTokenContract", "token0Address", "token1Address",],
+                    "required": ["liquidityTokenContract", "token0Address", "token1Address", "marketContract"],
                     "properties": {
                         "liquidityTokenContract": { "bsonType": "string" },
+                        "marketContract": { "bsonType": "string" },
                         "token0Address": { "bsonType": "string" },
                         "token1Address": { "bsonType": "string" },
                         "yieldPerBlock": { "bsonType": "string" },
