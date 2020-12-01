@@ -54,9 +54,6 @@ class SwapApi {
                     to: lodash_1.isString(req.query.to) ? parseFloat(req.query.to) : Date.now(),
                     limit: lodash_1.isString(req.query.limit) ? parseFloat(req.query.limit) : 150,
                 };
-                console.log(query);
-                console.log(collections_1.SWAP_COLLECTIONS.candleCollections);
-                console.log(collections_1.SWAP_COLLECTIONS.candleCollections[query.baseTokenAddress]);
                 const candleCollection = collections_1.SWAP_COLLECTIONS.candleCollections[query.baseTokenAddress][query.assetTokenAddress][query.timeframe];
                 const candles = yield candleCollection
                     .find(utils_1.removeEmptyFields({ openTimestamp: { $gt: query.from, $lte: query.to } }))
