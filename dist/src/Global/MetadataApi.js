@@ -38,9 +38,12 @@ class MetadataApi {
     getCirculatingSupply() {
         return __awaiter(this, void 0, void 0, function* () {
             const lockedAddresses = [
+                "0x7ea17dcaF7dc70258Fb680DfFA1936DBeB6FEE21",
                 "0x15E6aE26EbFD684F2c547663A1E4eDd0e880724c",
-                "0xb9Ab6A54322428A91fe1543Ae35080458780E970",
                 ENV_1.CONTRACTS["YieldFarm"].address,
+                ENV_1.CONTRACTS["TeamReservedVault"].address,
+                ENV_1.CONTRACTS["MarketingVaultContract"].address,
+                ENV_1.CONTRACTS["CommunityVault"].address,
             ];
             api_1.GLOBAL_API.app.get(`${MetadataApi.URL_PREFIX}ifex/circulatingSupply`, (req, res) => __awaiter(this, void 0, void 0, function* () {
                 const rawTotalSupply = ethers_1.BigNumber.from(yield this.ifexContract.methods.totalSupply().call());

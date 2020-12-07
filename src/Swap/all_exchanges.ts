@@ -114,8 +114,6 @@ class Exchange {
     async startTradeListener() {
         this.swapEventEmitter = this.contract.events.Swap()
             .on("data", async (event: any) => {
-                console.log("trade", event);
-
                 const trade: Trade = {
                     baseTokenAmount: event.returnValues.base_token_amount,
                     assetTokenAmount: event.returnValues.asset_token_amount,

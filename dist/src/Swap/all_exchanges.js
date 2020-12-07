@@ -91,7 +91,6 @@ class Exchange {
         return __awaiter(this, void 0, void 0, function* () {
             this.swapEventEmitter = this.contract.events.Swap()
                 .on("data", (event) => __awaiter(this, void 0, void 0, function* () {
-                console.log("trade", event);
                 const trade = {
                     baseTokenAmount: event.returnValues.base_token_amount,
                     assetTokenAmount: event.returnValues.asset_token_amount,

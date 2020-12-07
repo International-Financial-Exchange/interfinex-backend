@@ -26,9 +26,12 @@ class MetadataApi {
 
     async getCirculatingSupply() {
         const lockedAddresses = [
+            "0x7ea17dcaF7dc70258Fb680DfFA1936DBeB6FEE21",
             "0x15E6aE26EbFD684F2c547663A1E4eDd0e880724c",
-            "0xb9Ab6A54322428A91fe1543Ae35080458780E970",
             CONTRACTS["YieldFarm"].address,
+            CONTRACTS["TeamReservedVault"].address,
+            CONTRACTS["MarketingVaultContract"].address,
+            CONTRACTS["CommunityVault"].address,
         ];
 
         GLOBAL_API.app.get(`${MetadataApi.URL_PREFIX}ifex/circulatingSupply`, async (req, res) => {
