@@ -9,12 +9,14 @@ import { MARGIN_MARKET_API } from "./MarginSwap/api";
 import { YIELD_FARM } from "./YieldFarm/yieldfarm";
 import { YIELD_FARM_API } from "./YieldFarm/api";
 import { METADATA_API } from "./Global/MetadataApi";
+import { ILO } from "./ILO/ILO";
 
 const main = async () => {
     await DATABASE.init();
     await SWAP.start();
     await MARGIN_SWAP.start();
     await YIELD_FARM.start();
+    await ILO.start();
     
     await GLOBAL_API.start();
     await METADATA_API.start()

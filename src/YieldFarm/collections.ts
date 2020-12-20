@@ -4,7 +4,6 @@ export const FARMS_COLL_NAME = "yieldfarm.farms";
 
 export class YieldFarmCollections {
     public farmsCollection: any;
-    public tradeHistoryCollections: { [tokenContract: string]: any } = {};
 
     async init() {
         console.log(`\nFetching Yield Farm collections`);

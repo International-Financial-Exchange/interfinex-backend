@@ -19,6 +19,7 @@ class YieldFarm {
         return __awaiter(this, void 0, void 0, function* () {
             yield collections_1.YIELD_FARM_COLLECTIONS.init();
             yield YieldFarmContract_1.YIELD_FARM_CONTRACT.start();
+            // await ALL_EXCHANGES.start();
         });
     }
 }

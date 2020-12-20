@@ -20,3 +20,4 @@ class GlobalApi {
 }
 
 export const GLOBAL_API = new GlobalApi();
+

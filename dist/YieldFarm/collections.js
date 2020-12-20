@@ -13,6 +13,9 @@ exports.YIELD_FARM_COLLECTIONS = exports.YieldFarmCollections = exports.FARMS_CO
 const database_1 = require("../Global/database");
 exports.FARMS_COLL_NAME = "yieldfarm.farms";
 class YieldFarmCollections {
+    constructor() {
+        this.tradeHistoryCollections = {};
+    }
     init() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`\nFetching Yield Farm collections`);

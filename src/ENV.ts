@@ -16,7 +16,6 @@ export const ETH_NODE_URL: string = ENV.ethNodeUrls[ENV_CONFIG.network ?? Networ
 // @ts-ignore
 export const CONTRACTS: any = contracts[ENV_CONFIG.network ?? Network.localhost];
 
-
 import DividendERC20Abi from "../contracts/abi/DividendERC20.json";
 import ERC20Abi from "../contracts/abi/ERC20.json";
 import MarginFactoryAbi from "../contracts/abi/MarginFactory.json";
@@ -24,6 +23,7 @@ import MarginMarketAbi from "../contracts/abi/MarginMarket.json";
 import SwapExchangeAbi from "../contracts/abi/SwapExchange.json";
 import SwapFactoryAbi from "../contracts/abi/SwapFactory.json";
 import YieldFarmAbi from "../contracts/abi/YieldFarm.json";
+import ILOFactoryAbi from "../contracts/abi/ILOFactory.json";
 export const ABI = {
     DividendERC20: DividendERC20Abi,
     ERC20: ERC20Abi,
@@ -32,6 +32,7 @@ export const ABI = {
     SwapExchange: SwapExchangeAbi,
     SwapFactory: SwapFactoryAbi,
     YieldFarm: YieldFarmAbi,
+    ILOFactory: ILOFactoryAbi,
 };
 
 //@ts-ignore

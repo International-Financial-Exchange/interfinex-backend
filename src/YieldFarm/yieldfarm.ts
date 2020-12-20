@@ -9,7 +9,6 @@ class YieldFarm {
     async start() {
         await YIELD_FARM_COLLECTIONS.init();
         await YIELD_FARM_CONTRACT.start();
-        // await ALL_EXCHANGES.start();
     }
 }
 

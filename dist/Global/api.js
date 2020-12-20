@@ -8,19 +8,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.YIELD_FARM = void 0;
-const collections_1 = require("./collections");
-const YieldFarmContract_1 = require("./YieldFarmContract");
-class YieldFarm {
+exports.GLOBAL_API = void 0;
+const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
+class GlobalApi {
     constructor() {
+        this.app = express_1.default();
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield collections_1.YIELD_FARM_COLLECTIONS.init();
-            yield YieldFarmContract_1.YIELD_FARM_CONTRACT.start();
+            // TODO: This is unsafe! Change to only allow some origins
+            this.app.use(cors_1.default());
+            this.app.get("/", (req, res) => {
+                console.log("hello");
+                res.send("hello");
+            });
+            this.app.listen(GlobalApi.PORT, () => {
+                console.log(`\n🚀 API started and listening at port: ${GlobalApi.PORT}\n`);
+            });
         });
     }
 }
-exports.YIELD_FARM = new YieldFarm();
-//# sourceMappingURL=yieldfarm.js.map
+GlobalApi.PORT = 8080;
+exports.GLOBAL_API = new GlobalApi();
+//# sourceMappingURL=api.js.map

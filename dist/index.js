@@ -20,13 +20,11 @@ const api_3 = require("./MarginSwap/api");
 const yieldfarm_1 = require("./YieldFarm/yieldfarm");
 const api_4 = require("./YieldFarm/api");
 const MetadataApi_1 = require("./Global/MetadataApi");
-const ILO_1 = require("./ILO/ILO");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield database_1.DATABASE.init();
     yield swap_1.SWAP.start();
     yield MarginSwap_1.MARGIN_SWAP.start();
     yield yieldfarm_1.YIELD_FARM.start();
-    yield ILO_1.ILO.start();
     yield api_1.GLOBAL_API.start();
     yield MetadataApi_1.METADATA_API.start();
     yield api_2.SWAP_API.start();

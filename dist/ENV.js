@@ -26,7 +26,6 @@ const MarginMarket_json_1 = __importDefault(require("../contracts/abi/MarginMark
 const SwapExchange_json_1 = __importDefault(require("../contracts/abi/SwapExchange.json"));
 const SwapFactory_json_1 = __importDefault(require("../contracts/abi/SwapFactory.json"));
 const YieldFarm_json_1 = __importDefault(require("../contracts/abi/YieldFarm.json"));
-const ILOFactory_json_1 = __importDefault(require("../contracts/abi/ILOFactory.json"));
 exports.ABI = {
     DividendERC20: DividendERC20_json_1.default,
     ERC20: ERC20_json_1.default,
@@ -35,7 +34,6 @@ exports.ABI = {
     SwapExchange: SwapExchange_json_1.default,
     SwapFactory: SwapFactory_json_1.default,
     YieldFarm: YieldFarm_json_1.default,
-    ILOFactory: ILOFactory_json_1.default,
 };
 //@ts-ignore
 exports.getAbi = (abiName) => exports.ABI[abiName];

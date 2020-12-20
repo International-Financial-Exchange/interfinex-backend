@@ -9,18 +9,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.YIELD_FARM = void 0;
+exports.MARGIN_SWAP = void 0;
+const factory_1 = require("./factory");
 const collections_1 = require("./collections");
-const YieldFarmContract_1 = require("./YieldFarmContract");
-class YieldFarm {
+const all_margin_markets_1 = require("./all_margin_markets");
+class MarginSwap {
     constructor() {
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield collections_1.YIELD_FARM_COLLECTIONS.init();
-            yield YieldFarmContract_1.YIELD_FARM_CONTRACT.start();
+            yield collections_1.MARGIN_MARKET_COLLECTIONS.init();
+            yield factory_1.FACTORY.start();
+            yield all_margin_markets_1.ALL_MARGIN_MARKETS.start();
         });
     }
 }
-exports.YIELD_FARM = new YieldFarm();
-//# sourceMappingURL=yieldfarm.js.map
+exports.MARGIN_SWAP = new MarginSwap();
+//# sourceMappingURL=MarginSwap.js.map
