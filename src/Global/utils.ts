@@ -18,14 +18,48 @@ export const isObject = (item: any) => typeof item === "object" && !Array.isArra
 export const humanizeTokenAmount = (amount: string, decimals: number) => parseFloat(ethers.utils.formatUnits(amount, decimals));
 
 // Default decimals to 18 if a contract does not implement decimals
-export const getTokenDecimals = async (token: any) => {
+export const getTokenDecimals = async (token: any): Promise<number> => {
     const decimals = await token.methods.decimals().call()
         .catch(() => token.methods.DECIMALS().call())
         .catch(() => token.methods.Decimals().call())
         .catch(() => 18);
 
     return parseFloat(decimals);
-}
+};
+
+export const getTokenName = async (token: any ): Promise<string> => {
+    const name = await token.methods.name().call()
+        .catch(() => token.methods.NAME().call())
+        .catch(() => token.methods.Name().call())
+        .catch(() => "Unknown Name");
+
+    return name;
+};
+
+export const getTokenSymbol = async (token: any): Promise<string> => {
+    const symbol = await token.methods.symbol().call()
+        .catch(() => token.methods.SYMBOL().call())
+        .catch(() => token.methods.Symbol().call())
+        .catch(() => "N/A");
+
+    return symbol;
+};
+
+export type TokenInfo = {
+    decimals: number,
+    name: string,
+    symbol: string,
+    address: string,
+};
+
+export const getTokenInfo = async (token: any): Promise<TokenInfo> => {
+    return {
+        decimals: await getTokenDecimals(token),
+        name: await getTokenName(token),
+        symbol: await getTokenSymbol(token),
+        address: token.options.address,
+    };
+};
 
 declare global {
     interface Array<T> {

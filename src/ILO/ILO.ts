@@ -1,6 +1,6 @@
+import { ALL_ILOS } from "./all_ilos";
 import { ILO_COLLECTIONS } from "./collections";
 import { FACTORY } from "./factory";
-// import { YIELD_FARM_CONTRACT } from "./YieldFarmContract";
 
 class Ilo {
     constructor() {
@@ -10,7 +10,7 @@ class Ilo {
     async start() {
         await ILO_COLLECTIONS.init();
         await FACTORY.start();
-        // await ALL_EXCHANGES.start();
+        await ALL_ILOS.start();
     }
 }
 

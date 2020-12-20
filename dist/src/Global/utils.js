@@ -28,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTokenDecimals = exports.humanizeTokenAmount = exports.isObject = exports.removeEmptyFields = void 0;
+exports.getTokenInfo = exports.getTokenSymbol = exports.getTokenName = exports.getTokenDecimals = exports.humanizeTokenAmount = exports.isObject = exports.removeEmptyFields = void 0;
 const _ = __importStar(require("lodash"));
 const ethers_1 = require("ethers");
 // Empty out all keys in an object that have a field of undefined
@@ -50,6 +50,28 @@ exports.getTokenDecimals = (token) => __awaiter(void 0, void 0, void 0, function
         .catch(() => token.methods.Decimals().call())
         .catch(() => 18);
     return parseFloat(decimals);
+});
+exports.getTokenName = (token) => __awaiter(void 0, void 0, void 0, function* () {
+    const name = yield token.methods.name().call()
+        .catch(() => token.methods.NAME().call())
+        .catch(() => token.methods.Name().call())
+        .catch(() => "Unknown Name");
+    return name;
+});
+exports.getTokenSymbol = (token) => __awaiter(void 0, void 0, void 0, function* () {
+    const symbol = yield token.methods.symbol().call()
+        .catch(() => token.methods.SYMBOL().call())
+        .catch(() => token.methods.Symbol().call())
+        .catch(() => "N/A");
+    return symbol;
+});
+exports.getTokenInfo = (token) => __awaiter(void 0, void 0, void 0, function* () {
+    return {
+        decimals: yield exports.getTokenDecimals(token),
+        name: yield exports.getTokenName(token),
+        symbol: yield exports.getTokenSymbol(token),
+        address: token.options.address,
+    };
 });
 Array.prototype.last = function () {
     return _.cloneDeep(this[this.length - 1]);

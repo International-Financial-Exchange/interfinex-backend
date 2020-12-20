@@ -9,20 +9,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ILO = void 0;
-const all_ilos_1 = require("./all_ilos");
-const collections_1 = require("./collections");
-const factory_1 = require("./factory");
-class Ilo {
-    constructor() {
+exports.DutchAuction = void 0;
+class DutchAuction {
+    constructor(simpleIloDetails) {
+        this.simpleIloDetails = simpleIloDetails;
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield collections_1.ILO_COLLECTIONS.init();
-            yield factory_1.FACTORY.start();
-            yield all_ilos_1.ALL_ILOS.start();
+        });
+    }
+    stop() {
+        return __awaiter(this, void 0, void 0, function* () {
         });
     }
 }
-exports.ILO = new Ilo();
-//# sourceMappingURL=ILO.js.map
+exports.DutchAuction = DutchAuction;
+//# sourceMappingURL=DutchAuction.js.map

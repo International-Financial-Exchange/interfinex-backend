@@ -24,6 +24,8 @@ import SwapExchangeAbi from "../contracts/abi/SwapExchange.json";
 import SwapFactoryAbi from "../contracts/abi/SwapFactory.json";
 import YieldFarmAbi from "../contracts/abi/YieldFarm.json";
 import ILOFactoryAbi from "../contracts/abi/ILOFactory.json";
+import FixedPriceILOAbi from "../contracts/abi/FixedPriceILO.json";
+import DutchAuctionILOAbi from "../contracts/abi/DutchAuctionILO.json";
 export const ABI = {
     DividendERC20: DividendERC20Abi,
     ERC20: ERC20Abi,
@@ -33,6 +35,8 @@ export const ABI = {
     SwapFactory: SwapFactoryAbi,
     YieldFarm: YieldFarmAbi,
     ILOFactory: ILOFactoryAbi,
+    FixedPricedILO: FixedPriceILOAbi,
+    DutchAuctionILO: DutchAuctionILOAbi,
 };
 
 //@ts-ignore

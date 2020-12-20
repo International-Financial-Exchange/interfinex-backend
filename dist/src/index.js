@@ -21,6 +21,7 @@ const yieldfarm_1 = require("./YieldFarm/yieldfarm");
 const api_4 = require("./YieldFarm/api");
 const MetadataApi_1 = require("./Global/MetadataApi");
 const ILO_1 = require("./ILO/ILO");
+const api_5 = require("./ILO/api");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield database_1.DATABASE.init();
     yield swap_1.SWAP.start();
@@ -32,6 +33,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     yield api_2.SWAP_API.start();
     yield api_3.MARGIN_MARKET_API.start();
     yield api_4.YIELD_FARM_API.start();
+    yield api_5.ILO_API.start();
 });
 main();
 //# sourceMappingURL=index.js.map

@@ -10,6 +10,7 @@ import { YIELD_FARM } from "./YieldFarm/yieldfarm";
 import { YIELD_FARM_API } from "./YieldFarm/api";
 import { METADATA_API } from "./Global/MetadataApi";
 import { ILO } from "./ILO/ILO";
+import { ILO_API } from "./ILO/api";
 
 const main = async () => {
     await DATABASE.init();
@@ -23,6 +24,7 @@ const main = async () => {
     await SWAP_API.start();
     await MARGIN_MARKET_API.start();
     await YIELD_FARM_API.start();
+    await ILO_API.start();
 };
 
 main();
