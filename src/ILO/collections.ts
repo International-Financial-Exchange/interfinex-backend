@@ -71,6 +71,13 @@ export class ILOCollections {
             }
         });
 
+        iloListCollection.createIndex({ "startDate": 1, });
+        iloListCollection.createIndex({ "name": 1, });
+        iloListCollection.createIndex({ "endDate": 1, });
+        iloListCollection.createIndex({ "creationDate": 1, });
+        iloListCollection.createIndex({ "ethInvested": 1, });
+        iloListCollection.createIndex({ "score": 1, });
+
         return iloListCollection;
     }
 }

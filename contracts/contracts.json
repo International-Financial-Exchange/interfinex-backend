@@ -2,102 +2,102 @@
     "ganache": {
         "Token0": {
             "name": "Token0",
-            "address": "0x84Cb6C2471B265c33EB358Acc4E43b587ffA731D",
+            "address": "0xb990BEEB3eAdbae9eba1c2048EE250E16413270f",
             "artifactName": "ERC20"
         },
         "Token1": {
             "name": "Token1",
-            "address": "0x8e8f5a83c17f50c69cAbFd8FB9dF0B1FD053aAF1",
+            "address": "0x63273DFf9A9647736252D9784bbbAaDd46e65C69",
             "artifactName": "ERC20"
         },
         "Token2": {
             "name": "Token2",
-            "address": "0xF105CF13053F41063cff011c7dE37712E5f07Ee2",
+            "address": "0x3e9e2a7fd51CF81a5c6cd01db922Ce416831eb93",
             "artifactName": "ERC20"
         },
         "Token3": {
             "name": "Token3",
-            "address": "0x9619122Ef5530f55D231B730766e38468cE34C41",
+            "address": "0x85198c3DA5337Bd09b8aCC65148b5EE5aFb3a1b2",
             "artifactName": "ERC20"
         },
         "TemplateDividendERC20": {
             "name": "TemplateDividendERC20",
-            "address": "0x9836abCEDecea19eFf82A34Ea04EF9058ce95BbA",
+            "address": "0x6C2c173ae2e9438a66A21bC6C17B9FF5ee3f0925",
             "artifactName": "DividendERC20"
         },
         "IfexToken": {
             "name": "IfexToken",
-            "address": "0x560a85603B4fC32bc06CbbEfe93B91B3A887e4FF",
+            "address": "0x981cC333D8cafb8165BeDDd50e6f7D10c97a0574",
             "artifactName": "DividendERC20"
         },
         "WrappedEther": {
             "name": "WrappedEther",
-            "address": "0x5fb124b02848114F12783eC63C48CE0dbE756a9C",
+            "address": "0x97100557c34de3a7564dA40250AcD7Fac82163bB",
             "artifactName": "WrappedEther"
         },
         "TemplateSwapExchange": {
             "name": "TemplateSwapExchange",
-            "address": "0xBE321D0d5Eedf01708823746A4DCb65937641f9d",
+            "address": "0x053381cb116617C442CfacD5A7245AaEA6ccc527",
             "artifactName": "SwapExchange"
         },
         "SwapFactory": {
             "name": "SwapFactory",
-            "address": "0xcCf7Cd031b5B68606F665ae7fa68CDc8e08aF048",
+            "address": "0xA69cf7666FF5DC93603e6f98537A7Da4c17b9e03",
             "artifactName": "SwapFactory"
         },
         "SwapEthRouter": {
             "name": "SwapEthRouter",
-            "address": "0xB79253F86Cd209735c66Ed7c158eb600E8d6780B",
+            "address": "0x0C32fD28f64eb86A386379Ba47677b010c30b6c5",
             "artifactName": "SwapEthRouter"
         },
         "templateMarginMarket": {
             "name": "templateMarginMarket",
-            "address": "0x2dad9c502813c2Ba36F1b72e399770DE1fF32532",
+            "address": "0x1a216EAe3859D1B4b4553285f11dC25ea7C4C292",
             "artifactName": "MarginMarket"
         },
         "MarginFactory": {
             "name": "MarginFactory",
-            "address": "0x033A97EaD6559592010016983fe5BeF115E4A92d",
+            "address": "0x64b310d8200AD85067a7F258110B0846d013554a",
             "artifactName": "MarginFactory"
         },
         "MarginEthRouter": {
             "name": "MarginEthRouter",
-            "address": "0x653FE47cD2eDED15aa64bC18f162F6B65d3Ef4c8",
+            "address": "0xf6307C8A631f4d09B9bf9Ab10532afB1DFBbeAb3",
             "artifactName": "MarginEthRouter"
         },
         "YieldFarm": {
             "name": "YieldFarm",
-            "address": "0xA19b50C00c9ba4165f2A4691a2C3c118D9e239a1",
+            "address": "0x997f9F8c4681b428573976538672713f730Cd924",
             "artifactName": "YieldFarm"
         },
         "TeamReservedVault": {
             "name": "TeamReservedVault",
-            "address": "0x7Acb6622B4B1719b30560005a8fCfc4982E741ED",
+            "address": "0xf111F9F45A333Cc6E8da7b7A6d709c3560F3C83D",
             "artifactName": "Vault"
         },
         "MarketingVaultContract": {
             "name": "MarketingVaultContract",
-            "address": "0x71B0C57BB57914795Fabb9b84515012C4375Da31",
+            "address": "0x67c570578F5783C265Afa4937E38c4Ca710E1c03",
             "artifactName": "Vault"
         },
         "CommunityVault": {
             "name": "CommunityVault",
-            "address": "0x330D1f657193A90fB1119997896A1943aa4C7436",
+            "address": "0x513a68B908063f6E97B8A479082663FBA8135f72",
             "artifactName": "Vault"
         },
         "TemplateFixedPriceILO": {
             "name": "TemplateFixedPriceILO",
-            "address": "0xf47e14e4C66D3127f309d5B74A49C06d336ab4F3",
+            "address": "0x06712d25f528c901256a08281aB3B4F186474Ae2",
             "artifactName": "FixedPriceILO"
         },
         "TemplateDutchAuctionILO": {
             "name": "TemplateDutchAuctionILO",
-            "address": "0x38082Df26ce5b7b2b0c95d6987E32D18f167beb5",
+            "address": "0x77CdFCf540c69f98e423954492B94f9eE5837BAd",
             "artifactName": "DutchAuctionILO"
         },
         "ILOFactory": {
             "name": "ILOFactory",
-            "address": "0x92A141Ee9ea9DE042d514d93A3E1E0D4339A6052",
+            "address": "0xd5255b7F2B7bb38063FC5E24385dE86834D7bdf7",
             "artifactName": "ILOFactory"
         }
     },
