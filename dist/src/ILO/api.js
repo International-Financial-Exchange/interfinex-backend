@@ -13,6 +13,7 @@ exports.ILO_API = void 0;
 const api_1 = require("../Global/api");
 const collections_1 = require("./collections");
 const lodash_1 = require("lodash");
+const utils_1 = require("../Global/utils");
 var SortType;
 (function (SortType) {
     SortType[SortType["hot"] = 0] = "hot";
@@ -24,6 +25,23 @@ class IloApi {
     start() {
         return __awaiter(this, void 0, void 0, function* () {
             this.getIloList();
+            this.getIloItem();
+        });
+    }
+    getIloItem() {
+        return __awaiter(this, void 0, void 0, function* () {
+            api_1.GLOBAL_API.app.get(`${IloApi.URL_PREFIX}item`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const query = {
+                    contractAddress: lodash_1.isString(req.query.contractAddress) ? req.query.contractAddress : undefined,
+                    id: lodash_1.isString(req.query.id) ? parseFloat(req.query.id) : undefined,
+                };
+                if (!query.id && !query.contractAddress) {
+                    query.id = 1;
+                }
+                const iloListCollection = collections_1.ILO_COLLECTIONS.iloListCollection;
+                const iloItem = yield iloListCollection.findOne(utils_1.removeEmptyFields(query));
+                res.json(iloItem);
+            }));
         });
     }
     getIloList() {
@@ -31,6 +49,7 @@ class IloApi {
             api_1.GLOBAL_API.app.get(`${IloApi.URL_PREFIX}list`, (req, res) => __awaiter(this, void 0, void 0, function* () {
                 const query = {
                     limit: lodash_1.isString(req.query.limit) ? parseFloat(req.query.limit) : 150,
+                    offset: lodash_1.isString(req.query.offset) ? parseFloat(req.query.offset) : 0,
                     sortType: lodash_1.isString(req.query.sortType) ? parseInt(req.query.sortType) : SortType.hot,
                 };
                 const currentDateSeconds = Math.floor(Date.now() / 1000);
@@ -38,8 +57,8 @@ class IloApi {
                     switch (query.sortType) {
                         case SortType.hot:
                             return {
-                                startDate: { "lt": { currentDateSeconds } },
-                                endDate: { "gt": { currentDateSeconds } },
+                                startDate: { $lt: currentDateSeconds },
+                                endDate: { $gt: currentDateSeconds },
                             };
                         case SortType.new:
                         case SortType.top:
@@ -47,8 +66,8 @@ class IloApi {
                         case SortType.endingSoonest:
                             return {
                                 hasEnded: false,
-                                startDate: { "lt": { currentDateSeconds } },
-                                endDate: { "gt": { currentDateSeconds } },
+                                startDate: { $lt: currentDateSeconds },
+                                endDate: { $gt: currentDateSeconds },
                             };
                     }
                 })();
@@ -64,10 +83,12 @@ class IloApi {
                             return { endDate: 1, };
                     }
                 })();
+                console.log(findQuery, sortQuery, query);
                 const iloListCollection = collections_1.ILO_COLLECTIONS.iloListCollection;
                 const iloList = yield iloListCollection
                     .find(findQuery)
                     .sort(sortQuery)
+                    .skip(query.offset)
                     .limit(Math.min(query.limit, 500)) // Max of 500
                     .toArray();
                 res.json(iloList);

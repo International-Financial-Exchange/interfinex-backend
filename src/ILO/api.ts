@@ -1,6 +1,7 @@
 import { GLOBAL_API } from "../Global/api";
 import { ILO_COLLECTIONS, } from "./collections";
 import { isString } from "lodash";
+import { removeEmptyFields } from "../Global/utils";
 
 enum SortType {
     hot = 0,
@@ -14,17 +15,43 @@ class IloApi {
 
     async start() {
         this.getIloList();
+        this.getIloItem();
+    }
+
+    async getIloItem() {
+        type IloQuery = {
+            contractAddress?: string,
+            id?: number,
+        }
+
+        GLOBAL_API.app.get(`${IloApi.URL_PREFIX}item`, async (req, res) => {
+            const query: IloQuery = {
+                contractAddress: isString(req.query.contractAddress) ? req.query.contractAddress : undefined,
+                id: isString(req.query.id) ? parseFloat(req.query.id) : undefined,
+            };
+
+            if (!query.id && !query.contractAddress) {
+                query.id = 1;
+            }
+
+            const iloListCollection = ILO_COLLECTIONS.iloListCollection;
+            const iloItem = await iloListCollection.findOne(removeEmptyFields(query));
+
+            res.json(iloItem);
+        });
     }
 
     async getIloList() {
         type IloListQuery = {
             limit: number,
+            offset: number,
             sortType: SortType
         }
 
         GLOBAL_API.app.get(`${IloApi.URL_PREFIX}list`, async (req, res) => {
             const query: IloListQuery = {
                 limit: isString(req.query.limit) ? parseFloat(req.query.limit) : 150,
+                offset: isString(req.query.offset) ? parseFloat(req.query.offset) : 0,
                 sortType: isString(req.query.sortType) ? parseInt(req.query.sortType) : SortType.hot,
             };
 
@@ -33,17 +60,18 @@ class IloApi {
                 switch (query.sortType) {
                     case SortType.hot:
                         return {
-                            startDate: { "lt": { currentDateSeconds }},
-                            endDate: { "gt": { currentDateSeconds }},
+                            startDate: { $lt: currentDateSeconds},
+                            endDate: { $gt: currentDateSeconds },
                         };
                     case SortType.new:
                     case SortType.top:
                         return {};
                     case SortType.endingSoonest:
+
                         return { 
                             hasEnded: false,
-                            startDate: { "lt": { currentDateSeconds }},
-                            endDate: { "gt": { currentDateSeconds }},
+                            startDate: { $lt: currentDateSeconds },
+                            endDate: { $gt: currentDateSeconds },
                         };
                 }
             })();
@@ -61,10 +89,13 @@ class IloApi {
                 }
             })();
 
+            console.log(findQuery, sortQuery, query);
+
             const iloListCollection = ILO_COLLECTIONS.iloListCollection;
             const iloList = await iloListCollection
                 .find(findQuery)
                 .sort(sortQuery)
+                .skip(query.offset)
                 .limit(Math.min(query.limit, 500)) // Max of 500
                 .toArray();
 

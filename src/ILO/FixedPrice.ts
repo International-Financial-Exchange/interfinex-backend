@@ -20,6 +20,8 @@ export class FixedPrice {
         // TODO.
         // Start the listeners for deposits, withdrawals
         // Each time an event on the contract changes run the updater
+
+        await this.updateStats();
     }
 
     async updateStats() {

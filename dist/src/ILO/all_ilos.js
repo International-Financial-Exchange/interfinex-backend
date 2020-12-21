@@ -36,7 +36,7 @@ class AllIlos {
                 this.removeExchange(exchangeAddress);
             });
             const listeners = yield Promise.all(iloList.map((simpleIloDetails) => __awaiter(this, void 0, void 0, function* () { return this.addIlo(simpleIloDetails); })));
-            console.log(`   🎧 Listening to ${listeners.length} swap exchanges`);
+            console.log(`   🎧 Listening to ${listeners.length} ILOs`);
             // console.log(`   DEV: Deployed Exchanges:`, exchanges);
         });
     }

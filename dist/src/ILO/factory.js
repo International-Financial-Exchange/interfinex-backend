@@ -75,20 +75,18 @@ class Factory {
     }
     addIlo(iloId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const iloDetails = yield this.getIloSimpleDetails(iloId);
-            switch (iloDetails.type) {
-                case ILO_TYPES.FixedPrice:
-                    yield this.addFixedPriceIlo(iloDetails);
-                    break;
-            }
-            return iloDetails;
+            const simpleIloDetails = yield this.getIloSimpleDetails(iloId);
+            const iloDetails = yield this.getIloDetails(simpleIloDetails);
+            console.log(`   ⛏️  Inserting new Fixed Price ILO for: ${simpleIloDetails.contractAddress}`);
+            yield collections_1.ILO_COLLECTIONS.iloListCollection.updateOne({ contractAddress: simpleIloDetails.contractAddress }, { "$set": iloDetails }, { upsert: true });
+            return simpleIloDetails;
         });
     }
     startIloCreationListener() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`   🎧 Starting ILO creation listener`);
             this.factoryContract.events.NewILO()
-                .on("data", ({ returnValues: { id, contractAddress } }) => __awaiter(this, void 0, void 0, function* () {
+                .on("data", ({ returnValues: { id } }) => __awaiter(this, void 0, void 0, function* () {
                 const simpleIloDetails = yield this.addIlo(id);
                 this.events.emit("NewILO", simpleIloDetails);
             }))
@@ -97,13 +95,6 @@ class Factory {
                 yield collections_1.ILO_COLLECTIONS.iloListCollection.deleteOne({ contractAddress });
                 this.events.emit("RemovedILO", { contractAddress });
             }));
-        });
-    }
-    addFixedPriceIlo(simpleIloDetails) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log(`   ⛏️  Inserting new Fixed Price ILO for: ${simpleIloDetails.contractAddress}`);
-            const iloDetails = yield this.getIloDetails(simpleIloDetails);
-            return collections_1.ILO_COLLECTIONS.iloListCollection.updateOne({ contractAddress: simpleIloDetails.contractAddress }, { "$set": iloDetails }, { upsert: true });
         });
     }
 }

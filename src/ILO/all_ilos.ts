@@ -31,7 +31,7 @@ class AllIlos {
             )
         );
 
-        console.log(`   🎧 Listening to ${listeners.length} swap exchanges`);
+        console.log(`   🎧 Listening to ${listeners.length} ILOs`);
         // console.log(`   DEV: Deployed Exchanges:`, exchanges);
     }
 
