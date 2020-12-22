@@ -42,13 +42,12 @@ exports.removeEmptyFields = ($obj) => {
     return $obj;
 };
 exports.isObject = (item) => typeof item === "object" && !Array.isArray(item) && item !== null;
-exports.humanizeTokenAmount = (amount, decimals) => parseFloat(ethers_1.ethers.utils.formatUnits(amount, decimals));
-// Default decimals to 18 if a contract does not implement decimals
+exports.humanizeTokenAmount = (amount, decimals = 18) => parseFloat(ethers_1.ethers.utils.formatUnits(amount, decimals));
 exports.getTokenDecimals = (token) => __awaiter(void 0, void 0, void 0, function* () {
     const decimals = yield token.methods.decimals().call()
         .catch(() => token.methods.DECIMALS().call())
         .catch(() => token.methods.Decimals().call())
-        .catch(() => 18);
+        .catch(() => 18); // Default decimals to 18 if a contract does not implement decimals variable
     return parseFloat(decimals);
 });
 exports.getTokenName = (token) => __awaiter(void 0, void 0, void 0, function* () {

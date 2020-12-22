@@ -35,6 +35,8 @@ class IloApi {
                 query.id = 1;
             }
 
+            console.log(query)
+
             const iloListCollection = ILO_COLLECTIONS.iloListCollection;
             const iloItem = await iloListCollection.findOne(removeEmptyFields(query));
 
@@ -56,6 +58,8 @@ class IloApi {
                 limit: isString(req.query.limit) ? parseInt(req.query.limit) : 500,
                 offset: isString(req.query.offset) ? parseInt(req.query.offset) : 0,
             };
+
+            console.log("deposit query", query)
 
             const iloHistoryCollection = ILO_COLLECTIONS.depositHistoryCollections[query.contractAddress];
             

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FACTORY = exports.ILO_TYPES = void 0;
+exports.FACTORY = exports.ILO_TO_ABI_NAME = exports.ILO_TYPES = void 0;
 const collections_1 = require("./collections");
 const web3_1 = require("../Global/web3");
 // import { getTokenDecimals } from "../Global/utils";
@@ -22,6 +22,10 @@ var ILO_TYPES;
     ILO_TYPES[ILO_TYPES["DutchAuction"] = 2] = "DutchAuction";
 })(ILO_TYPES = exports.ILO_TYPES || (exports.ILO_TYPES = {}));
 ;
+exports.ILO_TO_ABI_NAME = {
+    [ILO_TYPES.FixedPrice]: "FixedPricedILO",
+    [ILO_TYPES.DutchAuction]: "DutchAuctionILO",
+};
 class Factory {
     constructor() {
         this.factoryContract = web3_1.newContract("ILOFactory", ENV_1.CONTRACTS["ILOFactory"].address);
@@ -65,10 +69,10 @@ class Factory {
     }
     getIloDetails(simpleIloDetails) {
         return __awaiter(this, void 0, void 0, function* () {
-            const iloContract = web3_1.newContract("FixedPricedILO", simpleIloDetails.contractAddress);
+            const iloContract = web3_1.newContract(exports.ILO_TO_ABI_NAME[simpleIloDetails.type], simpleIloDetails.contractAddress);
             const assetTokenContract = web3_1.newContract("ERC20", yield iloContract.methods.assetToken().call());
             const assetToken = yield utils_1.getTokenInfo(assetTokenContract);
-            return Object.assign(Object.assign({}, simpleIloDetails), { assetTokenAmount: parseInt(yield iloContract.methods.assetTokenAmount().call()), assetToken, startDate: parseInt(yield iloContract.methods.startDate().call()), endDate: parseInt(yield iloContract.methods.endDate().call()), softCap: parseInt(yield iloContract.methods.softCap().call()), percentageToLock: parseInt(yield iloContract.methods.percentageToLock().call()), liquidityUnlockDate: parseInt(yield iloContract.methods.liquidityUnlockDate().call()), creationDate: parseInt(yield iloContract.methods.creationDate().call()), creator: yield iloContract.methods.creator().call(), hasEnded: yield iloContract.methods.hasEnded().call(), 
+            return Object.assign(Object.assign({}, simpleIloDetails), { assetTokenAmount: parseInt(yield iloContract.methods.assetTokenAmount().call()), assetToken, startDate: parseInt(yield iloContract.methods.startDate().call()), endDate: parseInt(yield iloContract.methods.endDate().call()), percentageToLock: parseInt(yield iloContract.methods.percentageToLock().call()), liquidityUnlockDate: parseInt(yield iloContract.methods.liquidityUnlockDate().call()), creationDate: parseInt(yield iloContract.methods.creationDate().call()), creator: yield iloContract.methods.creator().call(), hasEnded: yield iloContract.methods.hasEnded().call(), 
                 // These should be init within each ILO listener
                 ethInvested: 0, score: 0, hasCreatorWithdrawn: false, additionalDetails: {} });
         });

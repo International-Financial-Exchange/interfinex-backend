@@ -1,10 +1,11 @@
 import { ILO_COLLECTIONS } from "./collections";
 // import { DutchAuction } from "./DutchAuction";
 import { FACTORY, SimpleILODetails, ILO_TYPES } from "./factory";
-import { FixedPrice } from "./FixedPrice";
+import { DutchAuctionListener } from "./listeners/DutchAuction";
+import { FixedPriceListener } from "./listeners/FixedPriceListener";
 
 class AllIlos {
-    public ilos: FixedPrice[] = [];
+    public ilos: FixedPriceListener[] = [];
 
     async start() {
         console.log(`\n🏁 Starting ILOs`);
@@ -38,13 +39,23 @@ class AllIlos {
     async addIlo(simpleIloDetails: SimpleILODetails) {
         switch (simpleIloDetails.type) {
             case ILO_TYPES.FixedPrice:
-                await this.addFixedPriceIlo(simpleIloDetails);
+                await this.addFixedPriceListener(simpleIloDetails);
+                break;
+            case ILO_TYPES.DutchAuction:
+                await this.addDutchAuctionListener(simpleIloDetails);
                 break;
         }
     }
 
-    async addFixedPriceIlo(simpleIloDetails: SimpleILODetails) {
-        const ilo = new FixedPrice(simpleIloDetails);
+    async addDutchAuctionListener(simpleIloDetails: SimpleILODetails) {
+        console.log("adding dutch auction")
+        const ilo = new DutchAuctionListener(simpleIloDetails);
+        await ilo.start();
+        this.ilos.push(ilo);
+    }
+
+    async addFixedPriceListener(simpleIloDetails: SimpleILODetails) {
+        const ilo = new FixedPriceListener(simpleIloDetails);
         await ilo.start();
         this.ilos.push(ilo);
     }

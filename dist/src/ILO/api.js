@@ -39,6 +39,7 @@ class IloApi {
                 if (!query.id && !query.contractAddress) {
                     query.id = 1;
                 }
+                console.log(query);
                 const iloListCollection = collections_1.ILO_COLLECTIONS.iloListCollection;
                 const iloItem = yield iloListCollection.findOne(utils_1.removeEmptyFields(query));
                 res.json(iloItem);
@@ -53,6 +54,7 @@ class IloApi {
                     limit: lodash_1.isString(req.query.limit) ? parseInt(req.query.limit) : 500,
                     offset: lodash_1.isString(req.query.offset) ? parseInt(req.query.offset) : 0,
                 };
+                console.log("deposit query", query);
                 const iloHistoryCollection = collections_1.ILO_COLLECTIONS.depositHistoryCollections[query.contractAddress];
                 const depositHistory = yield iloHistoryCollection
                     .find({})

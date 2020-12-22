@@ -10,6 +10,11 @@ export enum ILO_TYPES {
     DutchAuction = 2,
 };
 
+export const ILO_TO_ABI_NAME = {
+    [ILO_TYPES.FixedPrice]: "FixedPricedILO",
+    [ILO_TYPES.DutchAuction]: "DutchAuctionILO",
+};
+
 export type SimpleILODetails = {
     contractAddress: string, 
     name: string,
@@ -23,7 +28,6 @@ export type ILODetails = SimpleILODetails & {
     assetTokenAmount: number,
     startDate: number, 
     endDate: number, 
-    softCap: number,
     percentageToLock: number,
     liquidityUnlockDate: number,
     score: number,
@@ -87,7 +91,7 @@ class Factory {
     }
 
     async getIloDetails(simpleIloDetails: SimpleILODetails): Promise<ILODetails> {
-        const iloContract = newContract("FixedPricedILO", simpleIloDetails.contractAddress);
+        const iloContract = newContract(ILO_TO_ABI_NAME[simpleIloDetails.type], simpleIloDetails.contractAddress);
         
         const assetTokenContract = newContract("ERC20", await iloContract.methods.assetToken().call());
         const assetToken: TokenInfo = await getTokenInfo(assetTokenContract);
@@ -98,7 +102,6 @@ class Factory {
             assetToken,
             startDate: parseInt(await iloContract.methods.startDate().call()),
             endDate: parseInt(await iloContract.methods.endDate().call()),
-            softCap: parseInt(await iloContract.methods.softCap().call()),
             percentageToLock: parseInt(await iloContract.methods.percentageToLock().call()),
             liquidityUnlockDate: parseInt(await iloContract.methods.liquidityUnlockDate().call()),
             creationDate: parseInt(await iloContract.methods.creationDate().call()),

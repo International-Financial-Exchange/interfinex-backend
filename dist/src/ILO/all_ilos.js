@@ -13,7 +13,8 @@ exports.ALL_ILOS = void 0;
 const collections_1 = require("./collections");
 // import { DutchAuction } from "./DutchAuction";
 const factory_1 = require("./factory");
-const FixedPrice_1 = require("./FixedPrice");
+const DutchAuction_1 = require("./listeners/DutchAuction");
+const FixedPriceListener_1 = require("./listeners/FixedPriceListener");
 class AllIlos {
     constructor() {
         this.ilos = [];
@@ -44,14 +45,25 @@ class AllIlos {
         return __awaiter(this, void 0, void 0, function* () {
             switch (simpleIloDetails.type) {
                 case factory_1.ILO_TYPES.FixedPrice:
-                    yield this.addFixedPriceIlo(simpleIloDetails);
+                    yield this.addFixedPriceListener(simpleIloDetails);
+                    break;
+                case factory_1.ILO_TYPES.DutchAuction:
+                    yield this.addDutchAuctionListener(simpleIloDetails);
                     break;
             }
         });
     }
-    addFixedPriceIlo(simpleIloDetails) {
+    addDutchAuctionListener(simpleIloDetails) {
         return __awaiter(this, void 0, void 0, function* () {
-            const ilo = new FixedPrice_1.FixedPrice(simpleIloDetails);
+            console.log("adding dutch auction");
+            const ilo = new DutchAuction_1.DutchAuctionListener(simpleIloDetails);
+            yield ilo.start();
+            this.ilos.push(ilo);
+        });
+    }
+    addFixedPriceListener(simpleIloDetails) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const ilo = new FixedPriceListener_1.FixedPriceListener(simpleIloDetails);
             yield ilo.start();
             this.ilos.push(ilo);
         });

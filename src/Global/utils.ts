@@ -15,14 +15,13 @@ export const removeEmptyFields = ($obj: { [key: string]: any }) => {
 }
 
 export const isObject = (item: any) => typeof item === "object" && !Array.isArray(item) && item !== null;
-export const humanizeTokenAmount = (amount: string, decimals: number) => parseFloat(ethers.utils.formatUnits(amount, decimals));
+export const humanizeTokenAmount = (amount: string, decimals: number = 18) => parseFloat(ethers.utils.formatUnits(amount, decimals));
 
-// Default decimals to 18 if a contract does not implement decimals
 export const getTokenDecimals = async (token: any): Promise<number> => {
     const decimals = await token.methods.decimals().call()
         .catch(() => token.methods.DECIMALS().call())
         .catch(() => token.methods.Decimals().call())
-        .catch(() => 18);
+        .catch(() => 18); // Default decimals to 18 if a contract does not implement decimals variable
 
     return parseFloat(decimals);
 };
