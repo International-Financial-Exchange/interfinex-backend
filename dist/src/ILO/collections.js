@@ -13,12 +13,43 @@ exports.ILO_COLLECTIONS = exports.ILOCollections = exports.ILO_LIST_COLL_NAME = 
 const database_1 = require("../Global/database");
 exports.ILO_LIST_COLL_NAME = "ilo.list";
 class ILOCollections {
+    constructor() {
+        this.depositHistoryCollections = {};
+    }
     init() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`\nFetching ILO collections`);
             this.iloListCollection = yield this.getIloListCollection();
         });
     }
+    addDepositHistoryCollection(contractAddress) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const DEPOSITS_COLL_NAME = `ilo.depositHistory.${contractAddress}`;
+            let collExists = (yield database_1.DATABASE.db.listCollections({ name: DEPOSITS_COLL_NAME }).toArray())[0];
+            if (!collExists) {
+                console.log(`   ⛏️  Creating ${DEPOSITS_COLL_NAME} collection`);
+                yield database_1.DATABASE.db.createCollection(DEPOSITS_COLL_NAME, {
+                    "validator": {
+                        "$jsonSchema": {
+                            "bsonType": "object",
+                            "required": ["ethInvested", "assetTokensBought", "user", "txId", "timestamp"],
+                            "properties": {
+                                "ethInvested": { "bsonType": ["int", "double"] },
+                                "assetTokensBought": { "bsonType": ["int", "double"] },
+                                "user": { "bsonType": "string" },
+                                "txId": { "bsonType": "string" },
+                                "timestamp": { "bsonType": ["int", "double"] },
+                            }
+                        }
+                    }
+                });
+                database_1.DATABASE.db.collection(DEPOSITS_COLL_NAME).createIndex({ "timestamp": -1, });
+                database_1.DATABASE.db.collection(DEPOSITS_COLL_NAME).createIndex({ "user": 1, "txId": 1 });
+            }
+            this.depositHistoryCollections[contractAddress] = yield database_1.DATABASE.db.collection(DEPOSITS_COLL_NAME);
+        });
+    }
+    ;
     getIloListCollection() {
         return __awaiter(this, void 0, void 0, function* () {
             const collections = yield database_1.DATABASE.db.listCollections({ name: exports.ILO_LIST_COLL_NAME }).toArray();
@@ -46,7 +77,9 @@ class ILOCollections {
                             "score",
                             "ethInvested",
                             "creationDate",
+                            "creator",
                             "hasEnded",
+                            "hasCreatorWithdrawn",
                         ],
                         "properties": {
                             "contractAddress": { "bsonType": "string" },
@@ -73,6 +106,8 @@ class ILOCollections {
                             "ethInvested": { "bsonType": ["int", "double"] },
                             "creationDate": { "bsonType": ["int", "double"] },
                             "hasEnded": { "bsonType": "bool" },
+                            "creator": { "bsonType": "string" },
+                            "hasCreatorWithdrawn": { "bsonType": "bool" },
                             "additionalDetails": { "bsonType": "object" },
                         }
                     }

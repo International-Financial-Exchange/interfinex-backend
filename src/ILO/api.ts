@@ -16,6 +16,7 @@ class IloApi {
     async start() {
         this.getIloList();
         this.getIloItem();
+        this.getIloDepositHistory();
     }
 
     async getIloItem() {
@@ -38,6 +39,34 @@ class IloApi {
             const iloItem = await iloListCollection.findOne(removeEmptyFields(query));
 
             res.json(iloItem);
+        });
+    }
+
+    async getIloDepositHistory() {
+        type IloDepositHistoryQuery = {
+            contractAddress: string,
+            user?: string,
+            limit: number,
+            offset: number,
+        }
+
+        GLOBAL_API.app.get(`${IloApi.URL_PREFIX}depositHistory`, async (req, res) => {
+            const query: IloDepositHistoryQuery = {
+                contractAddress: isString(req.query.contractAddress) ? req.query.contractAddress : "",
+                limit: isString(req.query.limit) ? parseInt(req.query.limit) : 500,
+                offset: isString(req.query.offset) ? parseInt(req.query.offset) : 0,
+            };
+
+            const iloHistoryCollection = ILO_COLLECTIONS.depositHistoryCollections[query.contractAddress];
+            
+            const depositHistory = await iloHistoryCollection
+                .find({})
+                .sort({ timestamp: -1 })
+                .skip(query.offset)
+                .limit(Math.min(query.limit, 500)) // Max of 500
+                .toArray();
+                
+            res.json(depositHistory);
         });
     }
 

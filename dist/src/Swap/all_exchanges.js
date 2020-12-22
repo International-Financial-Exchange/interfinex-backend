@@ -83,13 +83,12 @@ class Exchange {
     }
     stop() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.swapEventEmitter.removeAllListeners("data");
-            this.swapEventEmitter.removeAllListeners("change");
+            this.swapListener.unsubscribe();
         });
     }
     startTradeListener() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.swapEventEmitter = this.contract.events.Swap()
+            this.swapListener = this.contract.events.Swap()
                 .on("data", (event) => __awaiter(this, void 0, void 0, function* () {
                 const trade = {
                     baseTokenAmount: event.returnValues.base_token_amount,

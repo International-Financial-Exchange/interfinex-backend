@@ -26,6 +26,7 @@ class IloApi {
         return __awaiter(this, void 0, void 0, function* () {
             this.getIloList();
             this.getIloItem();
+            this.getIloDepositHistory();
         });
     }
     getIloItem() {
@@ -41,6 +42,25 @@ class IloApi {
                 const iloListCollection = collections_1.ILO_COLLECTIONS.iloListCollection;
                 const iloItem = yield iloListCollection.findOne(utils_1.removeEmptyFields(query));
                 res.json(iloItem);
+            }));
+        });
+    }
+    getIloDepositHistory() {
+        return __awaiter(this, void 0, void 0, function* () {
+            api_1.GLOBAL_API.app.get(`${IloApi.URL_PREFIX}depositHistory`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const query = {
+                    contractAddress: lodash_1.isString(req.query.contractAddress) ? req.query.contractAddress : "",
+                    limit: lodash_1.isString(req.query.limit) ? parseInt(req.query.limit) : 500,
+                    offset: lodash_1.isString(req.query.offset) ? parseInt(req.query.offset) : 0,
+                };
+                const iloHistoryCollection = collections_1.ILO_COLLECTIONS.depositHistoryCollections[query.contractAddress];
+                const depositHistory = yield iloHistoryCollection
+                    .find({})
+                    .sort({ timestamp: -1 })
+                    .skip(query.offset)
+                    .limit(Math.min(query.limit, 500)) // Max of 500
+                    .toArray();
+                res.json(depositHistory);
             }));
         });
     }

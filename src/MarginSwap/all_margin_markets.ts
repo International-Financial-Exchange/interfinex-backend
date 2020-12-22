@@ -1,7 +1,6 @@
 import { MARGIN_MARKET_COLLECTIONS, } from "./collections";
 import { FACTORY } from "./factory";
 import { newContract } from "../Global/web3";
-import { EventEmitter } from "events";
 import Web3 from "web3";
 import { humanizeTokenAmount } from "../Global/utils";
 import { SWAP_COLLECTIONS } from "../Swap/collections";
@@ -78,7 +77,7 @@ class MarginMarket {
     public assetTokenAddress!: string;
     public assetTokenDecimals!: number;
     public collateralTokenDecimals!: number;
-    private eventEmitters: EventEmitter[] = [];
+    private eventListeners: any[] = [];
     private fundingHistoryCollection!: any;
     private positionsCollection!: any;
     private swapExchange!: any;
@@ -120,14 +119,13 @@ class MarginMarket {
     }
 
     async stop() {
-        this.eventEmitters.map(emitter => {
-            emitter.removeAllListeners("data");
-            emitter.removeAllListeners("change");
+        this.eventListeners.forEach(listener => {
+            listener.unsubscribe();
         })
     }
 
     async startFundingListener() {
-        const depositEmitter = this.contract.events.Deposit()
+        const depositListener = this.contract.events.Deposit()
             .on("data", async (event: any) => {
                 const deposit: DepositWithdraw = {
                     user: event.returnValues.user,
@@ -151,7 +149,7 @@ class MarginMarket {
                 this.removeEventFromFundingHistory(deposit);
             });
 
-        const withdrawEmitter = this.contract.events.Withdraw()
+        const withdrawListener = this.contract.events.Withdraw()
             .on("data", async (event: any) => {
                 const deposit: DepositWithdraw = {
                     user: event.returnValues.user,
@@ -175,8 +173,8 @@ class MarginMarket {
                 this.removeEventFromFundingHistory(deposit);
             });
 
-        this.eventEmitters.push(depositEmitter);
-        this.eventEmitters.push(withdrawEmitter);
+        this.eventListeners.push(depositListener);
+        this.eventListeners.push(withdrawListener);
     }
 
     async addEventToFundingHistory(event: DepositWithdraw) {
@@ -218,19 +216,19 @@ class MarginMarket {
             await this.updatePosition(position);
         }
 
-        const increaseEmitter = this.contract.events.IncreasePosition()
+        const increaseListener = this.contract.events.IncreasePosition()
             .on("data", handlePositionChange)
             .on("change", handlePositionChange);
 
-        const decreaseEmitter = this.contract.events.DecreasePosition()
+        const decreaseListener = this.contract.events.DecreasePosition()
             .on("data", handlePositionChange)
             .on("change", handlePositionChange);
 
-        const liquidatorEmitter = this.contract.events.LiquidatePosition()
+        const liquidatorListener = this.contract.events.LiquidatePosition()
             .on("data", handlePositionChange)
             .on("change", handlePositionChange);
 
-        this.eventEmitters = this.eventEmitters.concat([increaseEmitter, decreaseEmitter, liquidatorEmitter]);
+        this.eventListeners = this.eventListeners.concat([increaseListener, decreaseListener, liquidatorListener]);
     }
 
     async updatePosition(position: Position) {

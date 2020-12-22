@@ -66,7 +66,7 @@ class AllMarginMarkets {
 }
 class MarginMarket {
     constructor(contractAddress) {
-        this.eventEmitters = [];
+        this.eventListeners = [];
         this.contract = web3_1.newContract("MarginMarket", contractAddress);
     }
     start() {
@@ -93,15 +93,14 @@ class MarginMarket {
     }
     stop() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.eventEmitters.map(emitter => {
-                emitter.removeAllListeners("data");
-                emitter.removeAllListeners("change");
+            this.eventListeners.forEach(listener => {
+                listener.unsubscribe();
             });
         });
     }
     startFundingListener() {
         return __awaiter(this, void 0, void 0, function* () {
-            const depositEmitter = this.contract.events.Deposit()
+            const depositListener = this.contract.events.Deposit()
                 .on("data", (event) => __awaiter(this, void 0, void 0, function* () {
                 const deposit = {
                     user: event.returnValues.user,
@@ -122,7 +121,7 @@ class MarginMarket {
                 };
                 this.removeEventFromFundingHistory(deposit);
             }));
-            const withdrawEmitter = this.contract.events.Withdraw()
+            const withdrawListener = this.contract.events.Withdraw()
                 .on("data", (event) => __awaiter(this, void 0, void 0, function* () {
                 const deposit = {
                     user: event.returnValues.user,
@@ -143,8 +142,8 @@ class MarginMarket {
                 };
                 this.removeEventFromFundingHistory(deposit);
             }));
-            this.eventEmitters.push(depositEmitter);
-            this.eventEmitters.push(withdrawEmitter);
+            this.eventListeners.push(depositListener);
+            this.eventListeners.push(withdrawListener);
         });
     }
     addEventToFundingHistory(event) {
@@ -175,16 +174,16 @@ class MarginMarket {
                 console.log("new position", position);
                 yield this.updatePosition(position);
             });
-            const increaseEmitter = this.contract.events.IncreasePosition()
+            const increaseListener = this.contract.events.IncreasePosition()
                 .on("data", handlePositionChange)
                 .on("change", handlePositionChange);
-            const decreaseEmitter = this.contract.events.DecreasePosition()
+            const decreaseListener = this.contract.events.DecreasePosition()
                 .on("data", handlePositionChange)
                 .on("change", handlePositionChange);
-            const liquidatorEmitter = this.contract.events.LiquidatePosition()
+            const liquidatorListener = this.contract.events.LiquidatePosition()
                 .on("data", handlePositionChange)
                 .on("change", handlePositionChange);
-            this.eventEmitters = this.eventEmitters.concat([increaseEmitter, decreaseEmitter, liquidatorEmitter]);
+            this.eventListeners = this.eventListeners.concat([increaseListener, decreaseListener, liquidatorListener]);
         });
     }
     updatePosition(position) {

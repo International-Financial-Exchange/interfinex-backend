@@ -4,12 +4,41 @@ export const ILO_LIST_COLL_NAME = "ilo.list";
 
 export class ILOCollections {
     public iloListCollection: any;
+    public depositHistoryCollections: { [contractAddress: string]: any } = {};
 
     async init() {
         console.log(`\nFetching ILO collections`);
 
         this.iloListCollection = await this.getIloListCollection();
     }
+
+    async addDepositHistoryCollection(contractAddress: string): Promise<any> {
+        const DEPOSITS_COLL_NAME = `ilo.depositHistory.${contractAddress}`;
+        let collExists = (await DATABASE.db.listCollections({ name: DEPOSITS_COLL_NAME }).toArray())[0];
+        if (!collExists) {
+            console.log(`   ⛏️  Creating ${DEPOSITS_COLL_NAME} collection`);
+            await DATABASE.db.createCollection(DEPOSITS_COLL_NAME, {
+                "validator": {
+                    "$jsonSchema": { 
+                        "bsonType": "object",
+                        "required": ["ethInvested", "assetTokensBought", "user", "txId", "timestamp"],
+                        "properties": {
+                            "ethInvested": { "bsonType": ["int", "double"] },
+                            "assetTokensBought": { "bsonType": ["int", "double"] },
+                            "user": { "bsonType": "string" },
+                            "txId": { "bsonType": "string" },
+                            "timestamp": { "bsonType": ["int", "double"] },
+                        }
+                    }
+                }
+            });
+
+            DATABASE.db.collection(DEPOSITS_COLL_NAME).createIndex({ "timestamp": -1, });
+            DATABASE.db.collection(DEPOSITS_COLL_NAME).createIndex({ "user": 1, "txId": 1 });
+        }
+
+        this.depositHistoryCollections[contractAddress] = await DATABASE.db.collection(DEPOSITS_COLL_NAME);
+    };
 
     async getIloListCollection(): Promise<any> {
         const collections = await DATABASE.db.listCollections({ name: ILO_LIST_COLL_NAME }).toArray();
@@ -38,7 +67,9 @@ export class ILOCollections {
                         "score",
                         "ethInvested",
                         "creationDate",
+                        "creator",
                         "hasEnded",
+                        "hasCreatorWithdrawn",
                     ],
                     "properties": {
                         "contractAddress": { "bsonType": "string" },
@@ -65,6 +96,8 @@ export class ILOCollections {
                         "ethInvested": { "bsonType": ["int", "double"] },
                         "creationDate": { "bsonType": ["int", "double"] },
                         "hasEnded": { "bsonType": "bool" },
+                        "creator": { "bsonType": "string" },
+                        "hasCreatorWithdrawn": { "bsonType": "bool" },
                         "additionalDetails": { "bsonType": "object" },
                     }
                 }

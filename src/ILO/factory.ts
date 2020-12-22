@@ -29,7 +29,9 @@ export type ILODetails = SimpleILODetails & {
     score: number,
     ethInvested: number,
     creationDate: number,
+    creator: string,
     hasEnded: boolean,
+    hasCreatorWithdrawn: boolean,
     additionalDetails?: object, 
 };
 
@@ -100,11 +102,13 @@ class Factory {
             percentageToLock: parseInt(await iloContract.methods.percentageToLock().call()),
             liquidityUnlockDate: parseInt(await iloContract.methods.liquidityUnlockDate().call()),
             creationDate: parseInt(await iloContract.methods.creationDate().call()),
+            creator: await iloContract.methods.creator().call(),
             hasEnded: await iloContract.methods.hasEnded().call(),
 
             // These should be init within each ILO listener
             ethInvested: 0,
             score: 0,
+            hasCreatorWithdrawn: false,
             additionalDetails: {},
         }
     }
