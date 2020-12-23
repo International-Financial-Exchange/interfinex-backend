@@ -28,18 +28,25 @@ class ILOListener {
         return __awaiter(this, void 0, void 0, function* () { });
     }
     ;
+    getScore(ethInvested) {
+        console.log(this.details.startDate);
+        const timeScore = this.details.startDate / 600000;
+        const ethScore = Math.log(1 + ethInvested);
+        return timeScore + ethScore;
+    }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
             yield collections_1.ILO_COLLECTIONS.addDepositHistoryCollection(this.contract.options.address);
             this.depositHistoryCollection = collections_1.ILO_COLLECTIONS.depositHistoryCollections[this.contract.options.address];
-            this.details = yield this.updateStats(); // Initialiser case
+            this.details = yield collections_1.ILO_COLLECTIONS.iloListCollection.findOne({ contractAddress: this.simpleDetails.contractAddress });
+            yield this.updateStats(); // Initialiser case
             yield this.startDepositListener();
             yield this.startStatsListener();
         });
     }
     startStatsListener() {
         return __awaiter(this, void 0, void 0, function* () {
-            const subscription = this.contract.events.allEvents({}, () => this.updateStats());
+            const subscription = this.contract.events.allEvents({}, () => __awaiter(this, void 0, void 0, function* () { return this.details = yield this.updateStats(); }));
             this.eventListeners.push(subscription);
         });
     }

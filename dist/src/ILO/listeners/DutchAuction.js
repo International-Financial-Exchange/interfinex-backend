@@ -28,7 +28,7 @@ class DutchAuctionListener extends ILO_1.ILOListener {
             const hasEnded = yield this.contract.methods.hasEnded().call();
             const hasCreatorWithdrawn = yield this.contract.methods.hasCreatorWithdrawn().call();
             const ethInvested = utils_1.humanizeTokenAmount(yield this.contract.methods.etherAmountRaised().call(), 18);
-            const score = 0;
+            const score = this.getScore(ethInvested);
             const iloDetails = yield collections_1.ILO_COLLECTIONS.iloListCollection.findOneAndUpdate({ contractAddress: this.simpleDetails.contractAddress, }, { "$set": { additionalDetails, ethInvested, score, hasEnded, hasCreatorWithdrawn } }, { returnOriginal: false });
             return iloDetails.value;
         });

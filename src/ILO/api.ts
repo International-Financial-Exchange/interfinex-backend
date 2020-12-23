@@ -7,7 +7,7 @@ enum SortType {
     hot = 0,
     new = 1,
     top = 2, 
-    endingSoonest = 3,
+    timeLeft = 3,
 }
 
 class IloApi {
@@ -99,7 +99,7 @@ class IloApi {
                     case SortType.new:
                     case SortType.top:
                         return {};
-                    case SortType.endingSoonest:
+                    case SortType.timeLeft:
 
                         return { 
                             hasEnded: false,
@@ -117,7 +117,7 @@ class IloApi {
                         return { creationDate: -1 };
                     case SortType.top:
                         return { ethInvested: -1 };
-                    case SortType.endingSoonest:
+                    case SortType.timeLeft:
                         return { endDate: 1, };
                 }
             })();

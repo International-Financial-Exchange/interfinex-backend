@@ -30,17 +30,29 @@ export class ILOListener {
     //@ts-ignore
     async updateStats(): Promise<ILODetails> {};
 
+    getScore(ethInvested: number): number {
+        console.log(this.details.startDate);
+        const timeScore = this.details.startDate / 600000;
+        const ethScore = Math.log(1 + ethInvested);
+        
+        return timeScore + ethScore;
+    }
+
     async start() {
         await ILO_COLLECTIONS.addDepositHistoryCollection(this.contract.options.address);
         this.depositHistoryCollection = ILO_COLLECTIONS.depositHistoryCollections[this.contract.options.address];
+        this.details = await ILO_COLLECTIONS.iloListCollection.findOne({ contractAddress: this.simpleDetails.contractAddress });
 
-        this.details = await this.updateStats(); // Initialiser case
+        await this.updateStats(); // Initialiser case
         await this.startDepositListener();
         await this.startStatsListener();
     }
 
     async startStatsListener() {
-        const subscription = this.contract.events.allEvents({}, () => this.updateStats());
+        const subscription = this.contract.events.allEvents(
+            {}, 
+            async () => this.details = await this.updateStats()
+        );
         this.eventListeners.push(subscription);
     }
 

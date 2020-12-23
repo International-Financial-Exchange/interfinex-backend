@@ -24,7 +24,7 @@ export class DutchAuctionListener extends ILOListener {
         const hasEnded = await this.contract.methods.hasEnded().call();
         const hasCreatorWithdrawn = await this.contract.methods.hasCreatorWithdrawn().call();
         const ethInvested = humanizeTokenAmount(await this.contract.methods.etherAmountRaised().call(), 18);
-        const score = 0;
+        const score = this.getScore(ethInvested);
 
         const iloDetails = await ILO_COLLECTIONS.iloListCollection.findOneAndUpdate(
             { contractAddress: this.simpleDetails.contractAddress, },

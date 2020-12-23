@@ -19,7 +19,7 @@ var SortType;
     SortType[SortType["hot"] = 0] = "hot";
     SortType[SortType["new"] = 1] = "new";
     SortType[SortType["top"] = 2] = "top";
-    SortType[SortType["endingSoonest"] = 3] = "endingSoonest";
+    SortType[SortType["timeLeft"] = 3] = "timeLeft";
 })(SortType || (SortType = {}));
 class IloApi {
     start() {
@@ -85,7 +85,7 @@ class IloApi {
                         case SortType.new:
                         case SortType.top:
                             return {};
-                        case SortType.endingSoonest:
+                        case SortType.timeLeft:
                             return {
                                 hasEnded: false,
                                 startDate: { $lt: currentDateSeconds },
@@ -101,7 +101,7 @@ class IloApi {
                             return { creationDate: -1 };
                         case SortType.top:
                             return { ethInvested: -1 };
-                        case SortType.endingSoonest:
+                        case SortType.timeLeft:
                             return { endDate: 1, };
                     }
                 })();
