@@ -27,6 +27,7 @@ class IloApi {
             this.getIloList();
             this.getIloItem();
             this.getIloDepositHistory();
+            this.getUserIlos();
         });
     }
     getIloItem() {
@@ -63,6 +64,26 @@ class IloApi {
                     .limit(Math.min(query.limit, 500)) // Max of 500
                     .toArray();
                 res.json(depositHistory);
+            }));
+        });
+    }
+    getUserIlos() {
+        return __awaiter(this, void 0, void 0, function* () {
+            api_1.GLOBAL_API.app.get(`${IloApi.URL_PREFIX}userIlos`, (req, res) => __awaiter(this, void 0, void 0, function* () {
+                const query = {
+                    limit: lodash_1.isString(req.query.limit) ? parseFloat(req.query.limit) : 150,
+                    offset: lodash_1.isString(req.query.offset) ? parseFloat(req.query.offset) : 0,
+                    user: lodash_1.isString(req.query.user) ? req.query.user : "",
+                };
+                const userIlosCollection = collections_1.ILO_COLLECTIONS.userIlosCollection;
+                const userIlos = yield userIlosCollection.findOne({ user: query.user });
+                const { iloContractAddresses } = userIlos;
+                const contractsToFetch = iloContractAddresses.slice(query.offset, query.limit);
+                const iloListCollection = collections_1.ILO_COLLECTIONS.iloListCollection;
+                const iloList = yield iloListCollection
+                    .find({ contractAddress: { $in: contractsToFetch } })
+                    .toArray();
+                res.json(iloList);
             }));
         });
     }

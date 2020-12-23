@@ -69,6 +69,7 @@ class ILOListener {
                     txId: event.transactionHash,
                     timestamp: Date.now(),
                 };
+                yield collections_1.ILO_COLLECTIONS.userIlosCollection.updateOne({ user, }, { $addToSet: { iloContractAddresses: this.contract.options.address } }, { upsert: true });
                 yield this.depositHistoryCollection.insertOne(deposit);
             }))
                 .on("change", (event) => __awaiter(this, void 0, void 0, function* () {

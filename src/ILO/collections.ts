@@ -1,15 +1,18 @@
 import { DATABASE } from "../Global/database";
 
 export const ILO_LIST_COLL_NAME = "ilo.list";
+export const USER_ILOS_COLL_NAME = "ilo.userilos"
 
 export class ILOCollections {
     public iloListCollection: any;
+    public userIlosCollection: any;
     public depositHistoryCollections: { [contractAddress: string]: any } = {};
 
     async init() {
         console.log(`\nFetching ILO collections`);
 
         this.iloListCollection = await this.getIloListCollection();
+        this.userIlosCollection = await this.getUserIlosCollection();
     }
 
     async addDepositHistoryCollection(contractAddress: string): Promise<any> {
@@ -39,6 +42,38 @@ export class ILOCollections {
 
         this.depositHistoryCollections[contractAddress] = await DATABASE.db.collection(DEPOSITS_COLL_NAME);
     };
+
+    async getUserIlosCollection(): Promise<any> {
+        const collections = await DATABASE.db.listCollections({ name: USER_ILOS_COLL_NAME }).toArray();
+        const collExists = collections.length > 0;
+        if (collExists) return DATABASE.db.collection(USER_ILOS_COLL_NAME);
+
+        console.log(`   ⛏️  Creating ${USER_ILOS_COLL_NAME} collection`);
+
+        const userIlosCollection = await DATABASE.db.createCollection(USER_ILOS_COLL_NAME, {
+            "validator": {
+                "$jsonSchema": { 
+                    "bsonType": "object",
+                    "required": [
+                        "user",
+                        "iloContractAddresses",
+                    ],
+                    "properties": {
+                        "user": { "bsonType": "string" },
+                        "iloContractAddresses": { 
+                            "bsonType": "array",
+                            "uniqueItems": true,
+                            "additionalProperties": false,
+                            "items": { "bsonType": "string" },
+                        },
+                    }
+                }
+            }
+        });
+
+        userIlosCollection.createIndex({ "user": 1, });
+        return userIlosCollection;
+    }
 
     async getIloListCollection(): Promise<any> {
         const collections = await DATABASE.db.listCollections({ name: ILO_LIST_COLL_NAME }).toArray();

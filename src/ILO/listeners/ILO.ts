@@ -34,7 +34,7 @@ export class ILOListener {
         console.log(this.details.startDate);
         const timeScore = this.details.startDate / 600000;
         const ethScore = Math.log(1 + ethInvested);
-        
+
         return timeScore + ethScore;
     }
 
@@ -74,6 +74,12 @@ export class ILOListener {
                     txId: event.transactionHash,
                     timestamp: Date.now(),
                 };
+
+                await ILO_COLLECTIONS.userIlosCollection.updateOne(
+                    { user, },
+                    { $addToSet: { iloContractAddresses: this.contract.options.address }},
+                    { upsert: true },
+                );
 
                 await this.depositHistoryCollection.insertOne(deposit);
             })
