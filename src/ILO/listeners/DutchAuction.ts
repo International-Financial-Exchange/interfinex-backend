@@ -4,9 +4,9 @@ import { ILODetails, ILO_TYPES, SimpleILODetails } from "../factory";
 import { ILOListener } from "./ILO";
 
 export type DutchAuctionDetails = {
-    totalAssetTokensBought: number,
-    endTokensPerEth: number,
-    startTokensPerEth: number,
+    totalAssetTokensBought: string,
+    endTokensPerEth: string,
+    startTokensPerEth: string,
 };
 
 export class DutchAuctionListener extends ILOListener {
@@ -16,14 +16,14 @@ export class DutchAuctionListener extends ILOListener {
 
     async updateStats(): Promise<ILODetails> {
         const additionalDetails: DutchAuctionDetails = {
-            totalAssetTokensBought: parseInt(await this.contract.methods.totalAssetTokensBought().call()),
-            startTokensPerEth: parseInt(await this.contract.methods.startTokensPerEth().call()),
-            endTokensPerEth: parseInt(await this.contract.methods.endTokensPerEth().call()),
+            totalAssetTokensBought: await this.contract.methods.totalAssetTokensBought().call(),
+            startTokensPerEth: await this.contract.methods.startTokensPerEth().call(),
+            endTokensPerEth: await this.contract.methods.endTokensPerEth().call(),
         };
         
         const hasEnded = await this.contract.methods.hasEnded().call();
         const hasCreatorWithdrawn = await this.contract.methods.hasCreatorWithdrawn().call();
-        const ethInvested = humanizeTokenAmount(await this.contract.methods.etherAmountRaised().call(), 18);
+        const ethInvested: number = humanizeTokenAmount(await this.contract.methods.etherAmountRaised().call(), 18);
         const score = this.getScore(ethInvested);
 
         const iloDetails = await ILO_COLLECTIONS.iloListCollection.findOneAndUpdate(

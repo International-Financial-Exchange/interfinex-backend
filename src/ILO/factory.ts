@@ -98,11 +98,11 @@ class Factory {
 
         return {
             ...simpleIloDetails,
-            assetTokenAmount: parseInt(await iloContract.methods.assetTokenAmount().call()),
+            assetTokenAmount: await iloContract.methods.assetTokenAmount().call(),
             assetToken,
             startDate: parseInt(await iloContract.methods.startDate().call()),
             endDate: parseInt(await iloContract.methods.endDate().call()),
-            percentageToLock: parseInt(await iloContract.methods.percentageToLock().call()),
+            percentageToLock: await iloContract.methods.percentageToLock().call(),
             liquidityUnlockDate: parseInt(await iloContract.methods.liquidityUnlockDate().call()),
             creationDate: parseInt(await iloContract.methods.creationDate().call()),
             creator: await iloContract.methods.creator().call(),

@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FixedPriceListener = void 0;
+const ethers_1 = require("ethers");
 const collections_1 = require("../collections");
 const factory_1 = require("../factory");
 const ILO_1 = require("./ILO");
@@ -20,14 +21,16 @@ class FixedPriceListener extends ILO_1.ILOListener {
     updateStats() {
         return __awaiter(this, void 0, void 0, function* () {
             const additionalDetails = {
-                tokensPerEth: parseInt(yield this.contract.methods.tokensPerEth().call()),
-                totalAssetTokensBought: parseInt(yield this.contract.methods.totalAssetTokensBought().call()),
-                softCap: parseInt(yield this.contract.methods.softCap().call()),
+                tokensPerEth: yield this.contract.methods.tokensPerEth().call(),
+                totalAssetTokensBought: yield this.contract.methods.totalAssetTokensBought().call(),
+                softCap: yield this.contract.methods.softCap().call(),
             };
+            console.log(additionalDetails);
             const hasEnded = yield this.contract.methods.hasEnded().call();
             const hasCreatorWithdrawn = yield this.contract.methods.hasCreatorWithdrawn().call();
-            const ethInvested = additionalDetails.totalAssetTokensBought / additionalDetails.tokensPerEth;
+            const ethInvested = parseFloat(ethers_1.BigNumber.from(additionalDetails.totalAssetTokensBought).div(additionalDetails.tokensPerEth).toString());
             const score = this.getScore(ethInvested);
+            console.log({ additionalDetails, ethInvested, score, hasEnded, hasCreatorWithdrawn, });
             const iloDetails = yield collections_1.ILO_COLLECTIONS.iloListCollection.findOneAndUpdate({ contractAddress: this.simpleDetails.contractAddress, }, { "$set": { additionalDetails, ethInvested, score, hasEnded, hasCreatorWithdrawn, } }, { returnOriginal: false });
             return iloDetails.value;
         });

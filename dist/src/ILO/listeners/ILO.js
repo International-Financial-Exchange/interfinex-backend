@@ -29,7 +29,6 @@ class ILOListener {
     }
     ;
     getScore(ethInvested) {
-        console.log(this.details.startDate);
         const timeScore = this.details.startDate / 600000;
         const ethScore = Math.log(1 + ethInvested);
         return timeScore + ethScore;

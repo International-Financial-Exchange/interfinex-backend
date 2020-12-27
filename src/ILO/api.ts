@@ -131,7 +131,6 @@ class IloApi {
                     case SortType.top:
                         return {};
                     case SortType.timeLeft:
-
                         return { 
                             hasEnded: false,
                             startDate: { $lt: currentDateSeconds },

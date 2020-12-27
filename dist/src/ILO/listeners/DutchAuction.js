@@ -21,9 +21,9 @@ class DutchAuctionListener extends ILO_1.ILOListener {
     updateStats() {
         return __awaiter(this, void 0, void 0, function* () {
             const additionalDetails = {
-                totalAssetTokensBought: parseInt(yield this.contract.methods.totalAssetTokensBought().call()),
-                startTokensPerEth: parseInt(yield this.contract.methods.startTokensPerEth().call()),
-                endTokensPerEth: parseInt(yield this.contract.methods.endTokensPerEth().call()),
+                totalAssetTokensBought: yield this.contract.methods.totalAssetTokensBought().call(),
+                startTokensPerEth: yield this.contract.methods.startTokensPerEth().call(),
+                endTokensPerEth: yield this.contract.methods.endTokensPerEth().call(),
             };
             const hasEnded = yield this.contract.methods.hasEnded().call();
             const hasCreatorWithdrawn = yield this.contract.methods.hasCreatorWithdrawn().call();

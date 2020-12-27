@@ -120,10 +120,10 @@ export class ILOCollections {
                                 "address": { "bsonType": "string" },
                             }
                         },
-                        "assetTokenAmount": { "bsonType": ["int", "double"] },
+                        "assetTokenAmount": { "bsonType": "string" },
                         "startDate": { "bsonType": ["int", "double"] },
                         "endDate": { "bsonType": ["int", "double"] },
-                        "percentageToLock": { "bsonType": ["int", "double"] },
+                        "percentageToLock": { "bsonType": "string" },
                         "liquidityUnlockDate": { "bsonType": ["int", "double"] },
                         "score": { "bsonType": ["int", "double"] },
                         "ethInvested": { "bsonType": ["int", "double"] },
