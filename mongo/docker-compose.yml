@@ -1,0 +1,10 @@
+version: "3"
+services:
+  mongodb_server:
+    container_name: mongo-container
+    image: interfinex/mongo
+    volumes:
+        - "/interfinex_data/mongodb/data/"
+        - "/interfinex_data/mongodb/log/"
+    ports:
+        - "27017:27017"

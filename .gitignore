@@ -1,6 +1,3 @@
 node_modules
 database
-.env.json
-mongo
-Dockerfile
-docker-compose.yml
+dist
