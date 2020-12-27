@@ -91,7 +91,7 @@ class IloApi {
 
             const userIlosCollection = ILO_COLLECTIONS.userIlosCollection;
             const userIlos = await userIlosCollection.findOne({ user: query.user })
-            const { iloContractAddresses } = userIlos;
+            const { iloContractAddresses = [] } = userIlos || {};
             const contractsToFetch = iloContractAddresses.slice(query.offset, query.limit);
 
             const iloListCollection = ILO_COLLECTIONS.iloListCollection;
@@ -116,6 +116,8 @@ class IloApi {
                 offset: isString(req.query.offset) ? parseFloat(req.query.offset) : 0,
                 sortType: isString(req.query.sortType) ? parseInt(req.query.sortType) : SortType.hot,
             };
+
+            console.log(query);
 
             const currentDateSeconds = Math.floor(Date.now() / 1000);
             const findQuery = (() => {

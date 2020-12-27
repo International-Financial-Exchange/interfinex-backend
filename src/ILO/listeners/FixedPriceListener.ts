@@ -23,7 +23,7 @@ export class FixedPriceListener extends ILOListener {
         const hasEnded = await this.contract.methods.hasEnded().call();
         const hasCreatorWithdrawn = await this.contract.methods.hasCreatorWithdrawn().call();
         const ethInvested = additionalDetails.totalAssetTokensBought / additionalDetails.tokensPerEth;
-        const score = 0;
+        const score = this.getScore(ethInvested);
 
         const iloDetails = await ILO_COLLECTIONS.iloListCollection.findOneAndUpdate(
             { contractAddress: this.simpleDetails.contractAddress, },
